@@ -23,7 +23,7 @@ public class Jugador implements Serializable {
         this.nombre = nombre; 
         this.id = id; 
     }
-
+    
     public void reiniciarParaNuevaRonda() { 
         cartasNumero.clear(); 
         cartasModificador.clear(); 
@@ -39,6 +39,56 @@ public class Jugador implements Serializable {
         reiniciarParaNuevaRonda(); 
         puntajeTotal = 0; 
     }
+
+  
+
+    public boolean agregarCarta(Carta c) {
+        if (c == null) return false;
+        
+        switch (c.getTipo()) {
+            case NUMERO: 
+                // No permitir cartas numéricas duplicadas
+                if (tieneNumero(c.getValor())) {
+                    return false;
+                }
+                cartasNumero.add(c); 
+                return true;
+                
+            case MODIFICADOR: 
+                cartasModificador.add(c); 
+                return true;
+                
+            case SEGUNDA_OPORTUNIDAD: 
+                if (cartaSegundaOportunidad == null) {
+                    cartaSegundaOportunidad = c;
+                }
+                return true;
+                
+            case CONGELAR: 
+            case VOLTEAR_TRES:
+                cartasAccion.add(c); 
+                return true;
+                
+            default: 
+                return true;
+        }
+    }
+    
+    public void agregarCartaAccion(Carta c) { 
+        if (c != null) {
+            cartasAccion.add(c);
+        }
+    }
+    
+    public boolean tieneNumero(int n) { 
+        for (Carta c : cartasNumero) {
+            if (c.getValor() == n) {
+                return true;
+            }
+        }
+        return false; 
+    }
+
 
     public String getNombre() { return nombre; }
     public int getId() { return id; }
