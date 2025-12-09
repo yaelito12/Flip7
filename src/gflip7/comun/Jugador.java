@@ -40,14 +40,12 @@ public class Jugador implements Serializable {
         puntajeTotal = 0; 
     }
 
-  
 
     public boolean agregarCarta(Carta c) {
         if (c == null) return false;
         
         switch (c.getTipo()) {
             case NUMERO: 
-                // No permitir cartas numéricas duplicadas
                 if (tieneNumero(c.getValor())) {
                     return false;
                 }
@@ -89,7 +87,20 @@ public class Jugador implements Serializable {
         return false; 
     }
 
-
+ 
+    public boolean tieneSegundaOportunidad() { 
+        return cartaSegundaOportunidad != null; 
+    }
+    
+    public Carta usarSegundaOportunidad() { 
+        Carta c = cartaSegundaOportunidad; 
+        cartaSegundaOportunidad = null; 
+        return c; 
+    }
+    
+    public void setCartaSegundaOportunidad(Carta c) { 
+        cartaSegundaOportunidad = c; 
+    }
     public String getNombre() { return nombre; }
     public int getId() { return id; }
     public int getPuntajeTotal() { return puntajeTotal; }
