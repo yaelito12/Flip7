@@ -23,7 +23,23 @@ public class Jugador implements Serializable {
         this.nombre = nombre; 
         this.id = id; 
     }
+
+    public void reiniciarParaNuevaRonda() { 
+        cartasNumero.clear(); 
+        cartasModificador.clear(); 
+        cartasAccion.clear(); 
+        cartaSegundaOportunidad = null; 
+        puntajeRonda = 0; 
+        eliminado = false;
+        plantado = false;
+        congelado = false; 
+    }
     
+    public void reiniciarParaNuevoJuego() { 
+        reiniciarParaNuevaRonda(); 
+        puntajeTotal = 0; 
+    }
+
     public String getNombre() { return nombre; }
     public int getId() { return id; }
     public int getPuntajeTotal() { return puntajeTotal; }
