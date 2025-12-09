@@ -35,7 +35,7 @@ public class Carta implements Serializable {
         return esX2; 
     }
 
-
+ 
 
     public boolean esCartaAccion() { 
         return tipo == TipoCarta.CONGELAR || 
@@ -51,7 +51,7 @@ public class Carta implements Serializable {
         return tipo == TipoCarta.MODIFICADOR; 
     }
 
-  
+
 
     @Override
     public String toString() {
@@ -66,6 +66,25 @@ public class Carta implements Serializable {
                 return "VOLTEAR 3";
             case SEGUNDA_OPORTUNIDAD: 
                 return "2a OPORTUNIDAD";
+            default: 
+                return "?";
+        }
+    }
+
+
+
+    public String getNombreMostrar() {
+        switch (tipo) {
+            case NUMERO: 
+                return String.valueOf(valor);
+            case MODIFICADOR: 
+                return esX2 ? "X2" : "+" + valor;
+            case CONGELAR: 
+                return "FRZ";
+            case VOLTEAR_TRES: 
+                return "VL3";
+            case SEGUNDA_OPORTUNIDAD: 
+                return "2ND";
             default: 
                 return "?";
         }
