@@ -34,4 +34,20 @@ public class Carta implements Serializable {
     public boolean esX2() { 
         return esX2; 
     }
+
+ 
+
+    public boolean esCartaAccion() { 
+        return tipo == TipoCarta.CONGELAR || 
+               tipo == TipoCarta.VOLTEAR_TRES || 
+               tipo == TipoCarta.SEGUNDA_OPORTUNIDAD; 
+    }
+
+    public boolean esCartaNumero() { 
+        return tipo == TipoCarta.NUMERO; 
+    }
+
+    public boolean esCartaModificador() { 
+        return tipo == TipoCarta.MODIFICADOR; 
+    }
 }
