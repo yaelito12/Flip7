@@ -35,7 +35,7 @@ public class Carta implements Serializable {
         return esX2; 
     }
 
- 
+
 
     public boolean esCartaAccion() { 
         return tipo == TipoCarta.CONGELAR || 
@@ -49,5 +49,25 @@ public class Carta implements Serializable {
 
     public boolean esCartaModificador() { 
         return tipo == TipoCarta.MODIFICADOR; 
+    }
+
+  
+
+    @Override
+    public String toString() {
+        switch (tipo) {
+            case NUMERO: 
+                return "Numero " + valor;
+            case MODIFICADOR: 
+                return esX2 ? "X2" : "+" + valor;
+            case CONGELAR: 
+                return "CONGELAR";
+            case VOLTEAR_TRES: 
+                return "VOLTEAR 3";
+            case SEGUNDA_OPORTUNIDAD: 
+                return "2a OPORTUNIDAD";
+            default: 
+                return "?";
+        }
     }
 }
