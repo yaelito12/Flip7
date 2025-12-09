@@ -40,7 +40,6 @@ public class Jugador implements Serializable {
         puntajeTotal = 0; 
     }
 
-    // ✅ GESTIÓN DE CARTAS (COMMIT 3)
 
     public boolean agregarCarta(Carta c) {
         if (c == null) return false;
@@ -142,8 +141,49 @@ public class Jugador implements Serializable {
         return cartasNumero.size() >= 7;
     }
 
+   
+    public boolean estaActivo() { 
+        return !eliminado && !plantado && !congelado && conectado;
+    }
+
+    public boolean estaEliminado() { return eliminado; }
+    public void setEliminado(boolean b) { eliminado = b; }
+    
+    public boolean estaPlantado() { return plantado; }
+    public void setPlantado(boolean s) { plantado = s; }
+    
+    public boolean estaCongelado() { return congelado; }
+    public void setCongelado(boolean f) { 
+        congelado = f;
+        if (f) {
+            plantado = true;
+        }
+    }
+    
+    public boolean estaConectado() { return conectado; }
+    public void setConectado(boolean c) { conectado = c; }
+
+   
+    public int getCantidadCartasNumero() { return cartasNumero.size(); }
+    
+    public List<Carta> getCartasNumero() { return cartasNumero; }
+    public List<Carta> getCartasModificador() { return cartasModificador; }
+    public List<Carta> getCartasAccion() { return cartasAccion; }
+
     public String getNombre() { return nombre; }
     public int getId() { return id; }
     public int getPuntajeTotal() { return puntajeTotal; }
+    public void agregarAPuntajeTotal(int p) { puntajeTotal += p; }
     public int getPuntajeRonda() { return puntajeRonda; }
+    
+    public List<Carta> getTodasLasCartas() { 
+        List<Carta> todas = new ArrayList<>(); 
+        todas.addAll(cartasAccion); 
+        if (cartaSegundaOportunidad != null) {
+            todas.add(cartaSegundaOportunidad);
+        }
+        todas.addAll(cartasModificador);
+        todas.addAll(cartasNumero); 
+        return todas; 
+    }
 }
