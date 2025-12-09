@@ -40,6 +40,7 @@ public class Jugador implements Serializable {
         puntajeTotal = 0; 
     }
 
+    // ✅ GESTIÓN DE CARTAS (COMMIT 3)
 
     public boolean agregarCarta(Carta c) {
         if (c == null) return false;
@@ -87,7 +88,7 @@ public class Jugador implements Serializable {
         return false; 
     }
 
- 
+
     public boolean tieneSegundaOportunidad() { 
         return cartaSegundaOportunidad != null; 
     }
@@ -101,6 +102,46 @@ public class Jugador implements Serializable {
     public void setCartaSegundaOportunidad(Carta c) { 
         cartaSegundaOportunidad = c; 
     }
+
+    public int calcularPuntajeRonda() {
+        if (eliminado) { 
+            puntajeRonda = 0;
+            return 0;
+        }
+        
+        int total = 0; 
+        for (Carta c : cartasNumero) {
+            total += c.getValor();
+        }
+        
+        boolean tieneX2 = false; 
+        int totalMod = 0;
+        
+        for (Carta c : cartasModificador) { 
+            if (c.esX2()) {
+                tieneX2 = true;
+            } else {
+                totalMod += c.getValor();
+            }
+        }
+        
+        if (tieneX2) {
+            total *= 2;
+        }
+        
+        puntajeRonda = total + totalMod;
+        
+        if (cartasNumero.size() >= 7) {
+            puntajeRonda += 15;
+        }
+        
+        return puntajeRonda;
+    }
+    
+    public boolean tieneVoltear7() { 
+        return cartasNumero.size() >= 7;
+    }
+
     public String getNombre() { return nombre; }
     public int getId() { return id; }
     public int getPuntajeTotal() { return puntajeTotal; }
