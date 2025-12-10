@@ -109,3 +109,78 @@ public class SalaDeEspera extends JPanel {
 
         return center;
     }
+     private JPanel createButtonsPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        panel.setOpaque(false);
+
+        leaveBtn = createButton("SALIR", RED);
+        readyBtn = createButton("LISTO", GREEN);
+        joinAsPlayerBtn = createButton("UNIRSE", PURPLE);
+        joinAsPlayerBtn.setVisible(false);
+
+        leaveBtn.addActionListener(e -> {
+            if (listener != null) listener.onLeaveRoom();
+        });
+
+        readyBtn.addActionListener(e -> {
+            if (!isSpectator && !isReady && listener != null) {
+                isReady = true;
+                readyBtn.setText("LISTO!");
+                listener.onReady();
+                updateStatus();
+            }
+        });
+
+        joinAsPlayerBtn.addActionListener(e -> {
+            if (isSpectator && listener != null) {
+                listener.onJoinAsPlayer();
+            }
+        });
+
+        panel.add(leaveBtn);
+        panel.add(readyBtn);
+        panel.add(joinAsPlayerBtn);
+
+        return panel;
+    }
+
+    private JButton createButton(String text, Color color) {
+        JButton btn = new JButton(text) {
+            boolean hover = false;
+            Color btnColor = color;
+
+            {
+                addMouseListener(new MouseAdapter() {
+                    public void mouseEntered(MouseEvent e) { hover = true; repaint(); }
+                    public void mouseExited(MouseEvent e) { hover = false; repaint(); }
+                });
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int w = getWidth(), h = getHeight();
+                Color c = hover ? btnColor.brighter() : btnColor;
+
+                g2.setColor(new Color(0, 0, 0, 25));
+                g2.fill(new RoundRectangle2D.Float(3, 3, w - 3, h - 3, 14, 14));
+
+                g2.setColor(c);
+                g2.fill(new RoundRectangle2D.Float(0, 0, w - 3, h - 3, 14, 14));
+
+                g2.setColor(Color.WHITE);
+                g2.setFont(new Font("Arial", Font.BOLD, 14));
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(getText(), (w - fm.stringWidth(getText())) / 2,
+                              (h + fm.getAscent() - fm.getDescent()) / 2);
+            }
+        };
+
+        btn.setPreferredSize(new Dimension(180, 50));
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        return btn;
+    }
