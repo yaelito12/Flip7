@@ -249,3 +249,60 @@ public class PanelLobby extends JPanel {
 
         return btn;
     }
+    
+    private void mostrarDialogoCrearSala() {
+        String nombreJugador = campoNombre.getText().trim();
+        if (nombreJugador.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingresa tu nombre primero", "Error", JOptionPane.WARNING_MESSAGE);
+            campoNombre.requestFocus();
+            return;
+        }
+
+        JPanel panel = new JPanel(new GridLayout(2, 2, 10, 10));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JTextField campoNombreSala = new JTextField("Sala de " + nombreJugador);
+        JSpinner spinnerMax = new JSpinner(new SpinnerNumberModel(4, 2, 6, 1));
+
+        panel.add(new JLabel("Nombre de la sala:"));
+        panel.add(campoNombreSala);
+        panel.add(new JLabel("Máximo de jugadores:"));
+        panel.add(spinnerMax);
+
+        int r = JOptionPane.showConfirmDialog(this, panel, "Crear Nueva Sala", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (r == JOptionPane.OK_OPTION) {
+            String nombreSala = campoNombreSala.getText().trim();
+            int maxJugadores = (Integer) spinnerMax.getValue();
+
+            if (nombreSala.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (listener != null) {
+                listener.onCrearSala(nombreSala, nombreJugador, maxJugadores);
+            }
+        }
+    }
+
+    private void unirseSalaSeleccionada(boolean comoEspectador) {
+        int fila = tablaSalas.getSelectedRow();
+        if (fila < 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona una sala", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String nombreJugador = campoNombre.getText().trim();
+        if (nombreJugador.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingresa tu nombre primero", "Error", JOptionPane.WARNING_MESSAGE);
+            campoNombre.requestFocus();
+            return;
+        }
+
+        String idSala = (String) modeloTabla.getValueAt(fila, 4);
+
+        if (listener != null) {
+            listener.onUnirseSala(idSala, nombreJugador, comoEspectador);
+        }
+    }
