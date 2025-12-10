@@ -58,3 +58,96 @@ public class PanelCarta extends JPanel {
             x += anchoCarta + espacio;
         }
     }
+    private void dibujarCarta(Graphics2D g2, Carta carta, int x, int y, int w, int h) {
+
+        Color colorFondo, colorBorde, colorTexto, colorAcento;
+
+        switch (carta.getTipo()) {
+            case NUMERO:
+                colorFondo = new Color(255, 252, 240);
+                colorBorde = new Color(180, 165, 100);
+                colorAcento = new Color(200, 185, 120);
+                colorTexto = obtenerColorNumero(carta.getValor());
+                break;
+            case MODIFICADOR:
+                colorFondo = new Color(255, 220, 100);
+                colorBorde = new Color(200, 160, 50);
+                colorAcento = new Color(220, 180, 70);
+                colorTexto = new Color(150, 100, 30);
+                break;
+            case CONGELAR:
+                colorFondo = new Color(180, 220, 245);
+                colorBorde = new Color(100, 160, 200);
+                colorAcento = new Color(140, 190, 225);
+                colorTexto = new Color(40, 100, 150);
+                break;
+            case VOLTEAR_TRES:
+                colorFondo = new Color(255, 240, 120);
+                colorBorde = new Color(200, 180, 60);
+                colorAcento = new Color(230, 210, 90);
+                colorTexto = new Color(50, 120, 100);
+                break;
+            case SEGUNDA_OPORTUNIDAD:
+                colorFondo = new Color(230, 100, 120);
+                colorBorde = new Color(180, 60, 80);
+                colorAcento = new Color(210, 80, 100);
+                colorTexto = new Color(255, 250, 250);
+                break;
+            default:
+                colorFondo = Color.WHITE;
+                colorBorde = Color.GRAY;
+                colorAcento = Color.LIGHT_GRAY;
+                colorTexto = Color.BLACK;
+        }
+
+        g2.setColor(new Color(0, 0, 0, 60));
+        g2.fill(new RoundRectangle2D.Float(x + 3, y + 3, w, h, 10, 10));
+
+        GradientPaint grad = new GradientPaint(x, y, colorFondo, x, y + h, oscurecer(colorFondo, 0.95f));
+        g2.setPaint(grad);
+        g2.fill(new RoundRectangle2D.Float(x, y, w, h, 10, 10));
+
+        g2.setStroke(new BasicStroke(2.5f));
+        g2.setColor(colorBorde);
+        g2.draw(new RoundRectangle2D.Float(x + 4, y + 4, w - 8, h - 8, 6, 6));
+
+        g2.setStroke(new BasicStroke(0.8f));
+        g2.setColor(new Color(colorBorde.getRed(), colorBorde.getGreen(), colorBorde.getBlue(), 80));
+        g2.draw(new RoundRectangle2D.Float(x + 7, y + 7, w - 14, h - 14, 4, 4));
+
+        dibujarAlas(g2, x, y, w, h, colorAcento);
+
+        String texto = obtenerTextoCarta(carta);
+        g2.setColor(colorTexto);
+
+        Font fuente;
+        if (carta.getTipo() == Carta.TipoCarta.NUMERO) fuente = new Font("Georgia", Font.BOLD, 28);
+        else if (carta.getTipo() == Carta.TipoCarta.MODIFICADOR) fuente = new Font("Georgia", Font.BOLD, 22);
+        else fuente = new Font("Arial", Font.BOLD, 11);
+
+        g2.setFont(fuente);
+
+        FontMetrics fm = g2.getFontMetrics();
+        int tx = x + (w - fm.stringWidth(texto)) / 2;
+        int ty = y + h / 2 + fm.getAscent() / 3 - 2;
+
+        g2.setColor(new Color(0, 0, 0, 25));
+        g2.drawString(texto, tx + 1, ty + 1);
+        g2.setColor(colorTexto);
+        g2.drawString(texto, tx, ty);
+
+        String sub = obtenerSubtextoCarta(carta);
+        if (sub != null) {
+            g2.setFont(new Font("Arial", Font.BOLD, 7));
+            fm = g2.getFontMetrics();
+            tx = x + (w - fm.stringWidth(sub)) / 2;
+            g2.setColor(new Color(colorTexto.getRed(), colorTexto.getGreen(), colorTexto.getBlue(), 140));
+            g2.drawString(sub, tx, y + h - 10);
+        }
+
+        if (carta.getTipo() == Carta.TipoCarta.NUMERO) {
+            g2.setFont(new Font("Arial", Font.BOLD, 9));
+            g2.setColor(new Color(colorTexto.getRed(), colorTexto.getGreen(), colorTexto.getBlue(), 180));
+            g2.drawString(String.valueOf(carta.getValor()), x + 10, y + 16);
+        }
+    }
