@@ -210,4 +210,64 @@ public class PanelInicioSesion extends JPanel {
             escucha.alRegistrar(usuario, contrasena, servidor.isEmpty() ? "localhost" : servidor, puerto);
         }
     }
+     public void limpiarCampos() {
+        SwingUtilities.invokeLater(() -> {
+            campoUsuario.setText("");
+            campoContrasena.setText("");
+            campoServidor.setText("localhost");
+            campoPuerto.setText("5555");
+            
+            botonEntrar.setEnabled(true);
+            botonRegistrar.setEnabled(true);
+            botonEntrar.setText("ENTRAR");
+            botonRegistrar.setText("REGISTRAR");
+            
+            campoUsuario.requestFocusInWindow();
+        });
+    }
+    
+    public void restablecerBotones() {
+        SwingUtilities.invokeLater(() -> {
+            botonEntrar.setText("ENTRAR");
+            botonRegistrar.setText("REGISTRAR");
+            botonEntrar.setEnabled(true);
+            botonRegistrar.setEnabled(true);
+        });
+    }
+    
+    public void alFallarInicioSesion(String razon) {
+        SwingUtilities.invokeLater(() -> {
+            botonEntrar.setText("ENTRAR");
+            botonRegistrar.setText("REGISTRAR");
+            botonEntrar.setEnabled(true);
+            botonRegistrar.setEnabled(true);
+            JOptionPane.showMessageDialog(this, razon, "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+        });
+    }
+    
+    public void alFallarRegistro(String razon) {
+        SwingUtilities.invokeLater(() -> {
+            botonEntrar.setText("ENTRAR");
+            botonRegistrar.setText("REGISTRAR");
+            botonEntrar.setEnabled(true);
+            botonRegistrar.setEnabled(true);
+            JOptionPane.showMessageDialog(this, razon, "Error de registro", JOptionPane.ERROR_MESSAGE);
+        });
+    }
+    
+    public void alFallarConexion() {
+        SwingUtilities.invokeLater(() -> {
+            botonEntrar.setText("ENTRAR");
+            botonRegistrar.setText("REGISTRAR");
+            botonEntrar.setEnabled(true);
+            botonRegistrar.setEnabled(true);
+            JOptionPane.showMessageDialog(this, "No se pudo conectar al servidor", "Error", JOptionPane.ERROR_MESSAGE);
+        });
+    }
+    
+    public String obtenerNombreJugador() {
+        return campoUsuario.getText().trim();
+    }
+}
+
     
