@@ -1,13 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package gflip7.comun;
+package flip7.comun;
 
-/**
- *
- * @author Yaelll
- */
-public class MensajeJuego {
-    
+import java.io.Serializable;
+import java.util.List;
+
+public class MensajeJuego implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private TipoMensaje tipo;
+
+    public MensajeJuego(TipoMensaje tipo) {
+        this.tipo = tipo;
+    }
 }
