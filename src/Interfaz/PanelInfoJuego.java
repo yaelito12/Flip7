@@ -127,3 +127,23 @@ public class PanelInfoJuego extends JPanel {
         actualizarEtiqueta(etiquetaFase, "FASE", fase, color);
         actualizarEtiqueta(etiquetaMazo, "MAZO", e.getTamañoMazo() + " cartas", "#64748b");
     }
+      public void registrar(String msg) {
+        SwingUtilities.invokeLater(() -> {
+            areaRegistro.append(msg + "\n");
+            areaRegistro.setCaretPosition(areaRegistro.getDocument().getLength());
+        });
+    }
+
+    public void mostrarPuntuaciones(java.util.List<Jugador> jugadores) {
+        StringBuilder sb = new StringBuilder("\nPUNTUACIONES\n");
+        jugadores.sort((a, b) -> b.getPuntajeTotal() - a.getPuntajeTotal());
+
+        int pos = 1;
+        for (Jugador j : jugadores) {
+            sb.append(pos + ". " + j.getNombre() + ": " + j.getPuntajeTotal() + "\n");
+            pos++;
+        }
+
+        registrar(sb.toString());
+    }
+}
