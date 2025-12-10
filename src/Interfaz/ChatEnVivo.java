@@ -50,3 +50,72 @@ public class    ChatEnVivo extends JDialog {
 
         panelTitulo.add(logo, BorderLayout.CENTER);
         panelTitulo.add(sub, BorderLayout.SOUTH);
+        JPanel campos = new JPanel(new GridBagLayout());
+        campos.setOpaque(false);
+        campos.setBorder(new EmptyBorder(15, 0, 15, 0));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 0, 5, 0);
+
+        campoHost = crearCampo("localhost");
+        campoPuerto = crearCampo("5555");
+        campoNombre = crearCampo("Jugador");
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        campos.add(crearEtiqueta("Servidor"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        campos.add(campoHost, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
+        campos.add(crearEtiqueta("Puerto"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        campos.add(campoPuerto, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0;
+        campos.add(crearEtiqueta("Tu nombre"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        campos.add(campoNombre, gbc);
+
+        JPanel botones = new JPanel(new GridLayout(1, 2, 12, 0));
+        botones.setOpaque(false);
+
+        JButton botonCancelar = crearBoton("CANCELAR", new Color(180,70,70));
+        JButton botonConectar = crearBoton("CONECTAR", new Color(70,160,90));
+
+        botonCancelar.addActionListener(e -> { confirmado = false; dispose(); });
+        botonConectar.addActionListener(e -> conectar());
+        campoNombre.addActionListener(e -> conectar());
+
+        botones.add(botonCancelar);
+        botones.add(botonConectar);
+
+        principal.add(panelTitulo, BorderLayout.NORTH);
+        principal.add(campos, BorderLayout.CENTER);
+        principal.add(botones, BorderLayout.SOUTH);
+
+        setContentPane(principal);
+
+        final Point[] arrastre = {null};
+        principal.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                arrastre[0] = e.getPoint();
+            }
+        });
+
+        principal.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseDragged(MouseEvent e) {
+                Point p = getLocation();
+                setLocation(p.x + e.getX() - arrastre[0].x, p.y + e.getY() - arrastre[0].y);
+            }
+        });
+    }
