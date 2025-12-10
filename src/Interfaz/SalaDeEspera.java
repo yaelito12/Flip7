@@ -240,3 +240,64 @@ public void updateRoom(SalaJuego room) {
             updateStatus();
         });
     }
+
+public void setPlayerReady(String name) {
+        readyPlayers.add(name);
+    }
+
+    private void updateStatus() {
+        int readyCount = readyPlayers.size() + (isReady ? 1 : 0);
+
+        if (isSpectator) {
+            statusLabel.setText("Modo espectador - Esperando inicio de partida");
+            statusLabel.setForeground(PURPLE);
+        } else if (totalPlayers < 2) {
+            statusLabel.setText("Esperando más jugadores... (mínimo 2)");
+            statusLabel.setForeground(ORANGE);
+        } else if (readyCount < totalPlayers) {
+            statusLabel.setText("Esperando que todos estén listos (" + readyCount + "/" + totalPlayers + ")");
+            statusLabel.setForeground(ORANGE);
+        } else {
+            statusLabel.setText("¡Todos listos! Iniciando partida...");
+            statusLabel.setForeground(GREEN);
+        }
+    }
+
+    private JPanel createPlayerEntry(String name, boolean isHost, boolean ready, boolean isSpec) {
+        JPanel entry = new JPanel(new BorderLayout());
+        entry.setOpaque(false);
+        entry.setBorder(new EmptyBorder(12, 15, 12, 15));
+        entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+        String prefix = isSpec ? "(obs) "
+                : ready ? "[OK] "
+                : isHost ? "[Host] "
+                : "";
+
+        JLabel nameLabel = new JLabel(prefix + name);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        nameLabel.setForeground(
+            isSpec ? PURPLE
+            : ready ? GREEN.darker()
+            : isHost ? ORANGE
+            : new Color(51, 65, 85)
+        );
+
+        String roleText = isSpec ? "Observando"
+                : ready ? "Listo"
+                : isHost ? "Host"
+                : "Esperando";
+
+        JLabel roleLabel = new JLabel(roleText);
+        roleLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        roleLabel.setForeground(
+                isSpec ? PURPLE
+                : ready ? GREEN
+                : isHost ? ORANGE
+                : new Color(148, 163, 184));
+
+        entry.add(nameLabel, BorderLayout.WEST);
+        entry.add(roleLabel, BorderLayout.EAST);
+
+        return entry;
+    }
