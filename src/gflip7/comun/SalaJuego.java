@@ -11,6 +11,8 @@ public class SalaJuego implements Serializable {
     private String nombreHost;
     private int idHost;
     private int maxJugadores;
+    private List<String> nombresJugadores = new ArrayList<>();
+    private List<String> nombresEspectadores = new ArrayList<>();
     private boolean juegoIniciado;
     private long tiempoCreacion;
     
@@ -22,5 +24,6 @@ public class SalaJuego implements Serializable {
         this.idHost = idHost;
         this.maxJugadores = maxJugadores;
         this.tiempoCreacion = System.currentTimeMillis();
+        this.nombresJugadores.add(nombreHost);
     }
 }
