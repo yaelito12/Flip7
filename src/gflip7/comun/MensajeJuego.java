@@ -1,8 +1,13 @@
-package flip7.comun;
+package gflip7.comun;
 
-import gflip7.comun.SalaJuego;
+
 import java.io.Serializable;
 import java.util.List;
+import flip7.comun.Carta;
+import flip7.comun.Jugador;
+import flip7.comun.EstadoJuego;
+import flip7.comun.SalaJuego;
+import flip7.comun.Usuario;
 
 public class MensajeJuego implements Serializable {
     private static final long serialVersionUID = 1L;
