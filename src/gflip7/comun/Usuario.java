@@ -19,4 +19,28 @@ public class Usuario implements Serializable {
         this.partidasGanadas = 0;
         this.puntajeTotal = 0;
     }
+   
+    public Usuario(int id, String nombreUsuario, int partidasJugadas, 
+                   int partidasGanadas, int puntajeTotal) {
+        this.id = id;
+        this.nombreUsuario = nombreUsuario;
+        this.partidasJugadas = partidasJugadas;
+        this.partidasGanadas = partidasGanadas;
+        this.puntajeTotal = puntajeTotal;
+    }
+
+    public void agregarPartida(boolean gano, int puntaje) {
+        partidasJugadas++;
+        if (gano) {
+            partidasGanadas++;
+        }
+        puntajeTotal += puntaje;
+    }
+
+    public double getPorcentajeVictorias() {
+        if (partidasJugadas == 0) {
+            return 0.0;
+        }
+        return (partidasGanadas * 100.0) / partidasJugadas;
+    }
 }
