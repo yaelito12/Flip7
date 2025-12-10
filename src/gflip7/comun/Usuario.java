@@ -19,7 +19,7 @@ public class Usuario implements Serializable {
         this.partidasGanadas = 0;
         this.puntajeTotal = 0;
     }
-   
+    
     public Usuario(int id, String nombreUsuario, int partidasJugadas, 
                    int partidasGanadas, int puntajeTotal) {
         this.id = id;
@@ -28,7 +28,7 @@ public class Usuario implements Serializable {
         this.partidasGanadas = partidasGanadas;
         this.puntajeTotal = puntajeTotal;
     }
-
+    
     public void agregarPartida(boolean gano, int puntaje) {
         partidasJugadas++;
         if (gano) {
@@ -36,11 +36,61 @@ public class Usuario implements Serializable {
         }
         puntajeTotal += puntaje;
     }
-
+    
     public double getPorcentajeVictorias() {
         if (partidasJugadas == 0) {
             return 0.0;
         }
         return (partidasGanadas * 100.0) / partidasJugadas;
+    }
+    public int getId() { 
+        return id; 
+    }
+    
+    public void setId(int id) { 
+        this.id = id; 
+    }
+    
+    public String getNombreUsuario() { 
+        return nombreUsuario; 
+    }
+    
+    public String getContrasena() { 
+        return contrasena; 
+    }
+    
+    public int getPartidasJugadas() { 
+        return partidasJugadas; 
+    }
+    
+    public void setPartidasJugadas(int partidasJugadas) { 
+        this.partidasJugadas = partidasJugadas; 
+    }
+    
+    public int getPartidasGanadas() { 
+        return partidasGanadas; 
+    }
+    
+    public void setPartidasGanadas(int partidasGanadas) { 
+        this.partidasGanadas = partidasGanadas; 
+    }
+    
+    public int getPuntajeTotal() { 
+        return puntajeTotal; 
+    }
+    
+    public void setPuntajeTotal(int puntajeTotal) { 
+        this.puntajeTotal = puntajeTotal; 
+    }
+    
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", nombreUsuario='" + nombreUsuario + '\'' +
+                ", partidasJugadas=" + partidasJugadas +
+                ", partidasGanadas=" + partidasGanadas +
+                ", puntajeTotal=" + puntajeTotal +
+                '}';
     }
 }
