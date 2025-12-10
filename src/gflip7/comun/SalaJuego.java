@@ -26,4 +26,24 @@ public class SalaJuego implements Serializable {
         this.tiempoCreacion = System.currentTimeMillis();
         this.nombresJugadores.add(nombreHost);
     }
+    
+    public String getIdSala() { return idSala; }
+    public String getNombreSala() { return nombreSala; }
+    public String getNombreHost() { return nombreHost; }
+    public int getIdHost() { return idHost; }
+    public int getMaxJugadores() { return maxJugadores; }
+    public int getJugadoresActuales() { return nombresJugadores.size(); }
+    public int getCantidadEspectadores() { return nombresEspectadores.size(); }
+    public long getTiempoCreacion() { return tiempoCreacion; }
+    
+    public List<String> getNombresJugadores() {
+        return new ArrayList<>(nombresJugadores);
+    }
+    
+    public List<String> getNombresEspectadores() {
+        return new ArrayList<>(nombresEspectadores);
+    }
+    
+    public boolean isJuegoIniciado() { return juegoIniciado; }
+    public void setJuegoIniciado(boolean iniciado) { this.juegoIniciado = iniciado; }
 }
