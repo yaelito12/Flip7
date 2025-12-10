@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -91,5 +93,45 @@ public class ManejadorBaseDatos {
             System.err.println("[BD] Error login: " + e.getMessage());
             return null;
         }
+    }
+    
+     public synchronized List<Usuario> obtenerRankings(int limite) {
+        List<Usuario> rankings = new ArrayList<>();
+        if (conexion == null) return rankings;
+        try {
+            String consulta = "SELECT id, nombre_usuario, partidas_jugadas, partidas_ganadas, puntaje_total FROM usuarios ORDER BY puntaje_total DESC LIMIT ?";
+            PreparedStatement stmt = conexion.prepareStatement(consulta);
+            stmt.setInt(1, limite);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Usuario usuario = new Usuario(rs.getInt("id"), rs.getString("nombre_usuario"), rs.getInt("partidas_jugadas"), rs.getInt("partidas_ganadas"), rs.getInt("puntaje_total"));
+                rankings.add(usuario);
+            }
+            rs.close();
+            stmt.close();
+            System.out.println("[BD] Rankings obtenidos: " + rankings.size() + " usuarios");
+        } catch (SQLException e) {
+            System.err.println("[BD] Error obteniendo rankings: " + e.getMessage());
+        }
+        return rankings;
+    }
+     
+     public synchronized boolean actualizarEstadisticas(int idUsuario, boolean gano, int puntaje) {
+        if (conexion == null) return false;
+        try {
+            PreparedStatement stmt = conexion.prepareStatement("UPDATE usuarios SET partidas_jugadas = partidas_jugadas + 1, partidas_ganadas = partidas_ganadas + ?, puntaje_total = puntaje_total + ? WHERE id = ?");
+            stmt.setInt(1, gano ? 1 : 0);
+            stmt.setInt(2, puntaje);
+            stmt.setInt(3, idUsuario);
+            int filas = stmt.executeUpdate();
+            stmt.close();
+            return filas > 0;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+    
+    public void cerrar() {
+        try { if (conexion != null && !conexion.isClosed()) conexion.close(); } catch (SQLException e) {}
     }
 }
