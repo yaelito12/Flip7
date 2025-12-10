@@ -100,3 +100,30 @@ public class PanelInfoJuego extends JPanel {
             + valor + "</span></html>"
         );
     }
+    private void actualizarEtiqueta(JLabel etiqueta, String titulo, String valor, String color) {
+        etiqueta.setText(
+            "<html><span style='color:#64748b;font-size:9px;font-weight:bold;'>"
+            + titulo + "</span><br><span style='color:" + color + ";font-size:15px;font-weight:bold;'>"
+            + valor + "</span></html>"
+        );
+    }
+
+    public void actualizarEstado(EstadoJuego e) {
+        if (e == null) return;
+
+        actualizarEtiqueta(etiquetaRonda, "RONDA", String.valueOf(e.getNumeroRonda()), "#1e293b");
+
+        String fase = "?";
+        String color = "#1e293b";
+
+        switch (e.getFase()) {
+            case ESPERANDO_JUGADORES: fase = "Esperando"; color = "#f59e0b"; break;
+            case REPARTIENDO:         fase = "Repartiendo"; color = "#3b82f6"; break;
+            case JUGANDO:             fase = "En juego"; color = "#22c55e"; break;
+            case FIN_RONDA:           fase = "Fin ronda"; color = "#f97316"; break;
+            case FIN_JUEGO:           fase = "Fin juego"; color = "#8b5cf6"; break;
+        }
+
+        actualizarEtiqueta(etiquetaFase, "FASE", fase, color);
+        actualizarEtiqueta(etiquetaMazo, "MAZO", e.getTamañoMazo() + " cartas", "#64748b");
+    }
