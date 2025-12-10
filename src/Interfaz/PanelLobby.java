@@ -306,3 +306,41 @@ public class PanelLobby extends JPanel {
             listener.onUnirseSala(idSala, nombreJugador, comoEspectador);
         }
     }
+      public void updateRoomList(List<SalaJuego> salas) {
+        SwingUtilities.invokeLater(() -> {
+            modeloTabla.setRowCount(0);
+
+            if (salas == null || salas.isEmpty())
+                return;
+
+            for (SalaJuego sala : salas) {
+
+                String estado;
+                if (sala.isJuegoIniciado()) estado = "En juego";
+                else if (sala.estaLlena()) estado = "Llena";
+                else estado = "Esperando";
+
+                String jugadores = sala.getJugadoresActuales() + "/" + sala.getMaxJugadores();
+
+                if (sala.getCantidadEspectadores() > 0)
+                    jugadores += " +" + sala.getCantidadEspectadores() + " obs";
+
+                modeloTabla.addRow(new Object[]{
+                        sala.getNombreSala(),
+                        sala.getNombreHost(),
+                        jugadores,
+                        estado,
+                        sala.getIdSala()
+                });
+            }
+        });
+    }
+
+    public String getPlayerName() {
+        return campoNombre.getText().trim();
+    }
+
+    public void setPlayerName(String nombre) {
+        campoNombre.setText(nombre);
+    }
+}
