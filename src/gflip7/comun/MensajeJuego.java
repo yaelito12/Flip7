@@ -1,5 +1,6 @@
 package flip7.comun;
 
+import gflip7.comun.SalaJuego;
 import java.io.Serializable;
 import java.util.List;
 
@@ -74,4 +75,17 @@ public class MensajeJuego implements Serializable {
     private Carta carta;
     private List<Jugador> jugadores;
     private EstadoJuego estadoJuego;
+
+    
+    private String idSala;
+    private String nombreSala;
+    private int maxJugadores;
+    private boolean esEspectador;
+    private List<SalaJuego> salas;
+    private SalaJuego sala;
+    private Usuario usuario;
+    private List<Usuario> rankings;
+    private List<String> jugadoresListos;
+    private String nombreUsuario;
+    private String contrasena;
 }
