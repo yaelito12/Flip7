@@ -67,7 +67,7 @@ public class MensajeJuego implements Serializable {
         RESPUESTA_RANKINGS
     }
 
-    // Campos de jugador y estado
+    // Campos previos (commits 3 y 4)
     private int idJugador;
     private int idJugadorObjetivo;
     private int numeroRonda;
@@ -77,7 +77,6 @@ public class MensajeJuego implements Serializable {
     private List<Jugador> jugadores;
     private EstadoJuego estadoJuego;
 
-    // Campos de salas, rankings y autenticación
     private String idSala;
     private String nombreSala;
     private int maxJugadores;
@@ -140,6 +139,71 @@ public class MensajeJuego implements Serializable {
         MensajeJuego m = new MensajeJuego(TipoMensaje.CONECTADO);
         m.idJugador = id;
         m.nombreJugador = nombre;
+        return m;
+    }
+
+
+    public static MensajeJuego crearSala(String nombreSala, String nombreJugador, int maxJugadores) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.CREAR_SALA);
+        m.nombreSala = nombreSala;
+        m.nombreJugador = nombreJugador;
+        m.maxJugadores = maxJugadores;
+        return m;
+    }
+
+    public static MensajeJuego unirseSala(String idSala, String nombreJugador) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.UNIRSE_SALA);
+        m.idSala = idSala;
+        m.nombreJugador = nombreJugador;
+        m.esEspectador = false;
+        return m;
+    }
+
+    public static MensajeJuego unirseSalaComoEspectador(String idSala, String nombreJugador) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.UNIRSE_SALA);
+        m.idSala = idSala;
+        m.nombreJugador = nombreJugador;
+        m.esEspectador = true;
+        return m;
+    }
+
+    public static MensajeJuego salirSala() {
+        return new MensajeJuego(TipoMensaje.SALIR_SALA);
+    }
+
+    public static MensajeJuego solicitarSalas() {
+        return new MensajeJuego(TipoMensaje.OBTENER_SALAS);
+    }
+
+    public static MensajeJuego listaSalas(List<SalaJuego> listaSalas) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.LISTA_SALAS);
+        m.salas = listaSalas;
+        return m;
+    }
+
+    public static MensajeJuego salaCreada(SalaJuego sala, int idJugador) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.SALA_CREADA);
+        m.sala = sala;
+        m.idJugador = idJugador;
+        return m;
+    }
+
+    public static MensajeJuego salaUnida(SalaJuego sala, int idJugador) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.SALA_UNIDA);
+        m.sala = sala;
+        m.idJugador = idJugador;
+        return m;
+    }
+
+    public static MensajeJuego salaActualizada(SalaJuego sala) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.SALA_ACTUALIZADA);
+        m.sala = sala;
+        return m;
+    }
+
+    public static MensajeJuego errorSala(String error) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.ERROR_SALA);
+        m.mensaje = error;
         return m;
     }
 }
