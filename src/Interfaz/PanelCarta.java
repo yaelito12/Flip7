@@ -1,6 +1,6 @@
-package flip7.client.gui;
+package cliente;
 
-import flip7.common.Carta;
+import gflip7.comun.Carta;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
@@ -151,3 +151,50 @@ public class PanelCarta extends JPanel {
             g2.drawString(String.valueOf(carta.getValor()), x + 10, y + 16);
         }
     }
+      private void dibujarAlas(Graphics2D g2, int x, int y, int w, int h, Color c) {
+        g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 100));
+        g2.setStroke(new BasicStroke(1.2f));
+        int yAla = y + 18;
+        g2.drawArc(x + 12, yAla, 12, 8, 0, 180);
+        g2.drawArc(x + w - 24, yAla, 12, 8, 0, 180);
+    }
+
+    private Color obtenerColorNumero(int v) {
+        switch (v) {
+            case 0: return new Color(80, 80, 80);
+            case 1: case 2: return new Color(110, 90, 60);
+            case 3: case 6: return new Color(20, 130, 110);
+            case 4: case 5: return new Color(170, 60, 90);
+            case 7: case 8: return new Color(220, 140, 70);
+            case 9: case 10: return new Color(120, 70, 140);
+            case 11: case 12: return new Color(70, 110, 160);
+            default: return Color.BLACK;
+        }
+    }
+
+    private Color oscurecer(Color c, float f) {
+        return new Color((int)(c.getRed() * f), (int)(c.getGreen() * f), (int)(c.getBlue() * f));
+    }
+
+    private String obtenerTextoCarta(Carta carta) {
+        switch (carta.getTipo()) {
+            case NUMERO: return String.valueOf(carta.getValor());
+            case MODIFICADOR: return carta.esX2() ? "×2" : "+" + carta.getValor();
+            case CONGELAR: return "CONGELAR";
+            case VOLTEAR_TRES: return "VOLTEAR 3";
+            case SEGUNDA_OPORTUNIDAD: return "2ND";
+            default: return "?";
+        }
+    }
+
+    private String obtenerSubtextoCarta(Carta carta) {
+        if (carta.getTipo() == Carta.TipoCarta.NUMERO) {
+            String[] n = {"CERO", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE", "DIEZ", "ONCE", "DOCE"};
+            return carta.getValor() < n.length ? n[carta.getValor()] : null;
+        }
+        if (carta.getTipo() == Carta.TipoCarta.SEGUNDA_OPORTUNIDAD) return "OPORTUNIDAD";
+        if (carta.getTipo() == Carta.TipoCarta.CONGELAR) return "CONGELAR";
+        if (carta.getTipo() == Carta.TipoCarta.VOLTEAR_TRES) return "TRES";
+        return null;
+    }
+}
