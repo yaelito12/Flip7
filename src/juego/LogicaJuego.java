@@ -4,6 +4,10 @@
  */
 package juego;
 
+import flip7.comun.Carta;
+import flip7.comun.EstadoJuego;
+import flip7.comun.Jugador;
+import flip7.comun.Mazo;
 import java.util.ArrayList;
 import java.util.List;
 
