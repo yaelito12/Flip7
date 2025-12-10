@@ -75,3 +75,32 @@ public class PanelJugador extends JPanel {
 
         super.paintComponent(g);
     }
+     private void dibujarHeader(Graphics2D g2, int w) {
+
+        // Fondo barra superior
+        g2.setColor(new Color(241, 245, 249));
+        g2.fill(new RoundRectangle2D.Float(3, 3, w - 10, 38, 13, 13));
+        g2.fillRect(3, 20, w - 10, 20);
+
+        Color ind;
+        if (jugador.estaFuera()) ind = ROJO;
+        else if (jugador.estaCongelado()) ind = CYAN;
+        else if (jugador.estaPlantado()) ind = VERDE;
+        else if (esMiTurno) ind = AZUL_OSCURO;
+        else ind = new Color(148, 163, 184);
+
+        g2.setColor(ind);
+        g2.fillOval(12, 12, 14, 14);
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
+        g2.setColor(new Color(30, 41, 59));
+
+        String nombre = jugador.getNombre() + (esLocal ? " (Tú)" : "");
+        g2.drawString(nombre, 32, 24);
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        String score = String.valueOf(jugador.getPuntajeTotal());
+        FontMetrics fm = g2.getFontMetrics();
+
+        g2.setColor(AZUL_OSCURO);
+        g2.drawString(score, w - fm.stringWidth(score) - 15, 26);
+    }
+
