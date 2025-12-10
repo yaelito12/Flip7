@@ -67,7 +67,6 @@ public class MensajeJuego implements Serializable {
         RESPUESTA_RANKINGS
     }
 
-    // Campos previos (commits 3 y 4)
     private int idJugador;
     private int idJugadorObjetivo;
     private int numeroRonda;
@@ -142,7 +141,6 @@ public class MensajeJuego implements Serializable {
         return m;
     }
 
-
     public static MensajeJuego crearSala(String nombreSala, String nombreJugador, int maxJugadores) {
         MensajeJuego m = new MensajeJuego(TipoMensaje.CREAR_SALA);
         m.nombreSala = nombreSala;
@@ -204,6 +202,60 @@ public class MensajeJuego implements Serializable {
     public static MensajeJuego errorSala(String error) {
         MensajeJuego m = new MensajeJuego(TipoMensaje.ERROR_SALA);
         m.mensaje = error;
+        return m;
+    }
+
+    public static MensajeJuego jugadorUnido(int id, String nombre) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.JUGADOR_UNIDO);
+        m.idJugador = id;
+        m.nombreJugador = nombre;
+        return m;
+    }
+
+    public static MensajeJuego juegoInicia(List<Jugador> jugadores) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.JUEGO_INICIA);
+        m.jugadores = jugadores;
+        return m;
+    }
+
+    public static MensajeJuego tuTurno(int id) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.TU_TURNO);
+        m.idJugador = id;
+        return m;
+    }
+
+    public static MensajeJuego cartaRepartida(int id, Carta carta) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.CARTA_REPARTIDA);
+        m.idJugador = id;
+        m.carta = carta;
+        return m;
+    }
+
+    public static MensajeJuego jugadorEliminado(int id, Carta carta) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.JUGADOR_ELIMINADO);
+        m.idJugador = id;
+        m.carta = carta;
+        return m;
+    }
+
+    public static MensajeJuego elegirObjetivoAccion(Carta carta, List<Jugador> activos) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.ELEGIR_OBJETIVO_ACCION);
+        m.carta = carta;
+        m.jugadores = activos;
+        return m;
+    }
+
+    public static MensajeJuego finRonda(List<Jugador> jugadores, int numeroRonda) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.FIN_RONDA);
+        m.jugadores = jugadores;
+        m.numeroRonda = numeroRonda;
+        return m;
+    }
+
+    public static MensajeJuego finJuego(List<Jugador> jugadores, int idGanador) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.FIN_JUEGO);
+        m.jugadores = jugadores;
+        m.idJugador = idGanador;
         return m;
     }
 }
