@@ -155,4 +155,59 @@ public class PanelInicioSesion extends JPanel {
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return boton;
     }
+     private void iniciarSesion() {
+        String usuario = campoUsuario.getText().trim();
+        String contrasena = new String(campoContrasena.getPassword());
+        String servidor = campoServidor.getText().trim();
+        int puerto = 5555;
+
+        try { puerto = Integer.parseInt(campoPuerto.getText().trim()); } catch (Exception e) {}
+        
+        if (usuario.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingresa tu usuario", "Error", JOptionPane.WARNING_MESSAGE);
+            campoUsuario.requestFocus();
+            return;
+        }
+        if (contrasena.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingresa tu contraseña", "Error", JOptionPane.WARNING_MESSAGE);
+            campoContrasena.requestFocus();
+            return;
+        }
+        
+        botonEntrar.setEnabled(false);
+        botonRegistrar.setEnabled(false);
+        botonEntrar.setText("...");
+        
+        if (escucha != null) {
+            escucha.alIniciarSesion(usuario, contrasena, servidor.isEmpty() ? "localhost" : servidor, puerto);
+        }
+    }
+    
+    private void registrar() {
+        String usuario = campoUsuario.getText().trim();
+        String contrasena = new String(campoContrasena.getPassword());
+        String servidor = campoServidor.getText().trim();
+        int puerto = 5555;
+
+        try { puerto = Integer.parseInt(campoPuerto.getText().trim()); } catch (Exception e) {}
+        
+        if (usuario.length() < 3) {
+            JOptionPane.showMessageDialog(this, "Usuario: mínimo 3 caracteres", "Error", JOptionPane.WARNING_MESSAGE);
+            campoUsuario.requestFocus();
+            return;
+        }
+        if (contrasena.length() < 4) {
+            JOptionPane.showMessageDialog(this, "Contraseña: mínimo 4 caracteres", "Error", JOptionPane.WARNING_MESSAGE);
+            campoContrasena.requestFocus();
+            return;
+        }
+        
+        botonEntrar.setEnabled(false);
+        botonRegistrar.setEnabled(false);
+        botonRegistrar.setText("...");
+        
+        if (escucha != null) {
+            escucha.alRegistrar(usuario, contrasena, servidor.isEmpty() ? "localhost" : servidor, puerto);
+        }
+    }
     
