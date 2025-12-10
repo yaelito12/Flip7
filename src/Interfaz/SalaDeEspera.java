@@ -44,3 +44,68 @@ public class SalaDeEspera extends JPanel {
         add(createCenterPanel(), BorderLayout.CENTER);
         add(createButtonsPanel(), BorderLayout.SOUTH);
     }
+    private JPanel createHeader() {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+
+        roomNameLabel = new JLabel("SALA DE ESPERA");
+        roomNameLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        roomNameLabel.setForeground(BLUE_DARK);
+
+        playersCountLabel = new JLabel("Jugadores: 0/0");
+        playersCountLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        playersCountLabel.setForeground(new Color(100, 116, 139));
+
+        header.add(roomNameLabel, BorderLayout.WEST);
+        header.add(playersCountLabel, BorderLayout.EAST);
+
+        return header;
+    }
+
+    private JPanel createCenterPanel() {
+        JPanel center = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                g2.setColor(new Color(0, 0, 0, 20));
+                g2.fill(new RoundRectangle2D.Float(4, 4, getWidth(), getHeight(), 20, 20));
+
+                g2.setColor(Color.WHITE);
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 4, getHeight() - 4, 20, 20));
+
+                g2.setStroke(new BasicStroke(2f));
+                g2.setColor(BLUE_DARK);
+                g2.draw(new RoundRectangle2D.Float(1, 1, getWidth() - 6, getHeight() - 6, 19, 19));
+            }
+        };
+
+        center.setOpaque(false);
+        center.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        JLabel title = new JLabel("Jugadores en la sala:");
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(new Color(51, 65, 85));
+
+        playerListPanel = new JPanel();
+        playerListPanel.setLayout(new BoxLayout(playerListPanel, BoxLayout.Y_AXIS));
+        playerListPanel.setOpaque(false);
+
+        JScrollPane scroll = new JScrollPane(playerListPanel);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(null);
+
+        center.add(title, BorderLayout.NORTH);
+        center.add(scroll, BorderLayout.CENTER);
+
+        statusLabel = new JLabel("Presiona LISTO para comenzar (mínimo 2 jugadores)");
+        statusLabel.setFont(new Font("Arial", Font.ITALIC, 13));
+        statusLabel.setForeground(new Color(100, 116, 139));
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusLabel.setBorder(new EmptyBorder(15, 0, 0, 0));
+        center.add(statusLabel, BorderLayout.SOUTH);
+
+        return center;
+    }
