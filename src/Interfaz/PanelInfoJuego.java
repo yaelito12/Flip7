@@ -1,6 +1,6 @@
 package Interfaz;
 
-import flip7.common.*;
+import gflip7.comun.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -64,3 +64,39 @@ public class PanelInfoJuego extends JPanel {
                 g2.draw(new RoundRectangle2D.Float(1, 1, getWidth() - 5, getHeight() - 5, 13, 13));
             }
         };
+          cajaRegistro.setOpaque(false);
+        cajaRegistro.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+        JLabel tituloReg = new JLabel("REGISTRO");
+        tituloReg.setFont(new Font("Arial", Font.BOLD, 11));
+        tituloReg.setForeground(AZUL_OSCURO);
+        tituloReg.setBorder(new EmptyBorder(0, 5, 8, 0));
+
+        areaRegistro = new JTextArea();
+        areaRegistro.setEditable(false);
+        areaRegistro.setOpaque(false);
+        areaRegistro.setForeground(new Color(51, 65, 85));
+        areaRegistro.setFont(new Font("Consolas", Font.PLAIN, 11));
+        areaRegistro.setLineWrap(true);
+        areaRegistro.setWrapStyleWord(true);
+
+        JScrollPane scroll = new JScrollPane(areaRegistro);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(null);
+        scroll.setPreferredSize(new Dimension(220, 140));
+
+        cajaRegistro.add(tituloReg, BorderLayout.NORTH);
+        cajaRegistro.add(scroll, BorderLayout.CENTER);
+
+        add(cajaInfo, BorderLayout.NORTH);
+        add(cajaRegistro, BorderLayout.CENTER);
+    }
+
+    private JLabel crearEtiqueta(String titulo, String valor) {
+        return new JLabel(
+            "<html><span style='color:#64748b;font-size:9px;font-weight:bold;'>"
+            + titulo + "</span><br><span style='color:#1e293b;font-size:15px;font-weight:bold;'>"
+            + valor + "</span></html>"
+        );
+    }
