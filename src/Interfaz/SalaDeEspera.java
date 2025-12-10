@@ -184,3 +184,59 @@ public class SalaDeEspera extends JPanel {
         btn.setContentAreaFilled(false);
         return btn;
     }
+    
+public void updateRoom(SalaJuego room) {
+        if (room == null) return;
+
+        SwingUtilities.invokeLater(() -> {
+
+            roomNameLabel.setText(room.getNombreSala());
+
+            String textCount = "Jugadores: " + room.getJugadoresActuales() + "/" + room.getMaxJugadores();
+            if (room.getCantidadEspectadores() > 0)
+                textCount += " | " + room.getCantidadEspectadores() + " observadores";
+
+            playersCountLabel.setText(textCount);
+
+            totalPlayers = room.getJugadoresActuales();
+            maxPlayers = room.getMaxJugadores();
+
+            // Mostrar botón "UNIRSE" si es espectador y hay espacio
+            joinAsPlayerBtn.setVisible(
+                isSpectator && !room.isJuegoIniciado() &&
+                room.getJugadoresActuales() < room.getMaxJugadores()
+            );
+
+            // --- LISTA DE JUGADORES ---
+            playerListPanel.removeAll();
+
+            java.util.List<String> jugadores = room.getJugadores();
+            for (int i = 0; i < jugadores.size(); i++) {
+                String nombre = jugadores.get(i);
+                boolean isHost = (i == 0);
+                boolean ready = readyPlayers.contains(nombre);
+                playerListPanel.add(createPlayerEntry(nombre, isHost, ready, false));
+                playerListPanel.add(Box.createVerticalStrut(8));
+            }
+
+            // --- LISTA DE ESPECTADORES ---
+            java.util.List<String> espectadores = room.getEspectadores();
+            if (!espectadores.isEmpty()) {
+                playerListPanel.add(Box.createVerticalStrut(10));
+                JLabel specTitle = new JLabel("--- Observadores ---");
+                specTitle.setFont(new Font("Arial", Font.ITALIC, 12));
+                specTitle.setForeground(new Color(148, 163, 184));
+                playerListPanel.add(specTitle);
+                playerListPanel.add(Box.createVerticalStrut(8));
+
+                for (String s : espectadores) {
+                    playerListPanel.add(createPlayerEntry(s, false, false, true));
+                    playerListPanel.add(Box.createVerticalStrut(6));
+                }
+            }
+
+            playerListPanel.revalidate();
+            playerListPanel.repaint();
+            updateStatus();
+        });
+    }
