@@ -1,13 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package juego;
 
-import flip7.comun.Carta;
-import flip7.comun.EstadoJuego;
-import flip7.comun.Jugador;
-import flip7.comun.Mazo;
+import gflip7.comun.Carta;
+import gflip7.comun.EstadoJuego;
+import gflip7.comun.Jugador;
+import gflip7.comun.Mazo;
 import java.util.ArrayList;
 import java.util.List;
 

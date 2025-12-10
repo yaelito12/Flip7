@@ -1,7 +1,7 @@
 
 package Servidor;
 
-import flip7.comun.Usuario;
+import gflip7.comun.Usuario;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,10 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author gerth
- */
+
 public class ManejadorBaseDatos {
      private static final String ARCHIVO_BD = "voltear7.db";
     private Connection conexion;

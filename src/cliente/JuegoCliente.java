@@ -1,4 +1,4 @@
-package flip7.cliente;
+package cliente;
 
 import java.io.*;
 import java.net.Socket;

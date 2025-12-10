@@ -1,4 +1,4 @@
-package flip7.servidor;
+package servidor;
 
 import java.io.IOException;
 import java.net.ServerSocket;

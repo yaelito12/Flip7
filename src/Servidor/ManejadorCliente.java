@@ -1,4 +1,4 @@
-package flip7.servidor;
+package servidor;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -10,7 +10,7 @@ public class ManejadorCliente implements Runnable {
     private int idCliente;
     private boolean ejecutando;
 
-    // ✅ ESTE CONSTRUCTOR ES EL QUE NECESITA TU SERVIDOR
+
     public ManejadorCliente(Socket socket, ServidorJuego servidor, int idCliente) {
         this.socket = socket;
         this.servidor = servidor;
@@ -24,7 +24,6 @@ public class ManejadorCliente implements Runnable {
             servidor.registrarCliente(this);
 
             while (ejecutando && !socket.isClosed()) {
-                // Aquí luego entrará GameMessage
             }
 
         } catch (Exception e) {
