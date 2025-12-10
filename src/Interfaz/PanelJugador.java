@@ -103,4 +103,49 @@ public class PanelJugador extends JPanel {
         g2.setColor(AZUL_OSCURO);
         g2.drawString(score, w - fm.stringWidth(score) - 15, 26);
     }
+     private void dibujarEstado(Graphics2D g2, int w, int h) {
+        String texto = null;
+        Color color = null;
+        Color fondo = null;
+
+        if (jugador.estaFuera()) {
+            texto = "ELIMINADO";
+            color = ROJO;
+            fondo = new Color(254, 226, 226);
+        } else if (jugador.estaCongelado()) {
+            texto = "CONGELADO";
+            color = CYAN;
+            fondo = new Color(207, 250, 254);
+        } else if (jugador.estaPlantado()) {
+            texto = "PLANTADO";
+            color = VERDE;
+            fondo = new Color(220, 252, 231);
+        } else if (esMiTurno && jugador.estaActivo()) {
+            texto = esLocal ? "► ¡TU TURNO!" : "► JUGANDO";
+            color = AZUL_OSCURO;
+            fondo = new Color(219, 234, 254);
+        }
+
+        if (texto != null) {
+            g2.setFont(new Font("Arial", Font.BOLD, 12));
+            FontMetrics fm = g2.getFontMetrics();
+
+            int wTxt = fm.stringWidth(texto) + 20;
+            int x = (w - wTxt) / 2;
+
+            g2.setColor(fondo);
+            g2.fill(new RoundRectangle2D.Float(x, h - 28, wTxt, 20, 10, 10));
+
+            g2.setColor(color);
+            g2.drawString(texto, x + 10, h - 14);
+        }
+    }
+
+    @Override
+    public Insets getInsets() {
+        return new Insets(45, 10, 35, 10);
+    }
+}
+
+
 
