@@ -46,4 +46,48 @@ public class SalaJuego implements Serializable {
     
     public boolean isJuegoIniciado() { return juegoIniciado; }
     public void setJuegoIniciado(boolean iniciado) { this.juegoIniciado = iniciado; }
+
+    public boolean estaLlena() { 
+        return nombresJugadores.size() >= maxJugadores;
+    }
+
+    public boolean estaVacia() {
+        return nombresJugadores.isEmpty() && nombresEspectadores.isEmpty();
+    }
+
+    public void agregarJugador(String nombre) {
+        if (!estaLlena() && !nombresJugadores.contains(nombre)) {
+            nombresJugadores.add(nombre);
+        }
+    }
+
+    public void agregarEspectador(String nombre) {
+        if (!nombresEspectadores.contains(nombre)) {
+            nombresEspectadores.add(nombre);
+        }
+    }
+
+    public boolean removerJugador(String nombre) {
+        return nombresJugadores.remove(nombre);
+    }
+
+    public boolean removerEspectador(String nombre) {
+        return nombresEspectadores.remove(nombre);
+    }
+
+    public boolean esJugador(String nombre) {
+        return nombresJugadores.contains(nombre);
+    }
+
+    public boolean esEspectador(String nombre) {
+        return nombresEspectadores.contains(nombre);
+    }
+
+    public boolean esHost(String nombre) {
+        return nombreHost != null && nombreHost.equals(nombre);
+    }
+
+    public int getCantidadTotal() {
+        return nombresJugadores.size() + nombresEspectadores.size();
+    }
 }
