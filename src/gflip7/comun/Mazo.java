@@ -12,26 +12,26 @@ public class Mazo implements Serializable {
     public Mazo() { 
         inicializarMazo(); 
     }
+    
 
- 
     private void inicializarMazo() {
         cartas.clear();
         
         cartas.add(new Carta(Carta.TipoCarta.NUMERO, 0));
-        
+           
         for (int numero = 1; numero <= 12; numero++) {
             for (int cantidad = 0; cantidad < numero; cantidad++) {
                 cartas.add(new Carta(Carta.TipoCarta.NUMERO, numero));
             }
         }
-        
-        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 2));
-        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 4));
-        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 6));
-        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 8));
-        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 8));
-        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 10));
-        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, -1));
+          
+        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 2));   
+        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 4)); 
+        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 6));   
+        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 8));   
+        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 8));   
+        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, 10)); 
+        cartas.add(new Carta(Carta.TipoCarta.MODIFICADOR, -1)); 
         
         for (int i = 0; i < 3; i++) {
             cartas.add(new Carta(Carta.TipoCarta.CONGELAR, 0));
@@ -47,7 +47,7 @@ public class Mazo implements Serializable {
         Collections.shuffle(cartas);
         System.out.println("[MAZO] Barajado");
     }
-
+    
     public Carta robarCarta() { 
         if (cartas.isEmpty()) {
             rebarajarDescarte(); 
