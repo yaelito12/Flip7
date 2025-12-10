@@ -116,4 +116,43 @@ public class PanelInicioSesion extends JPanel {
         
         return caja;
     }
+      private JTextField crearCampoTexto(String valor) {
+        JTextField campo = new JTextField(valor);
+        campo.setFont(new Font("Arial", Font.PLAIN, 15));
+        campo.setMaximumSize(new Dimension(300, 45));
+        campo.setPreferredSize(new Dimension(300, 45));
+        campo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(203, 213, 225), 2),
+            new EmptyBorder(10, 15, 10, 15)
+        ));
+        return campo;
+    }
+    
+    private JPanel crearPanelCampo(String etiqueta, JComponent campo) {
+        JPanel panel = new JPanel(new BorderLayout(0, 5));
+        panel.setOpaque(false);
+        panel.setMaximumSize(new Dimension(300, 70));
+        
+        JLabel lbl = new JLabel(etiqueta);
+        lbl.setFont(new Font("Arial", Font.BOLD, 13));
+        lbl.setForeground(new Color(51, 65, 85));
+        
+        panel.add(lbl, BorderLayout.NORTH);
+        panel.add(campo, BorderLayout.CENTER);
+        
+        return panel;
+    }
+    
+    private JButton crearBoton(String texto, Color color) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Arial", Font.BOLD, 14));
+        boton.setPreferredSize(new Dimension(140, 45));
+        boton.setBackground(color);
+        boton.setForeground(Color.WHITE);
+        boton.setFocusPainted(false);
+        boton.setBorderPainted(false);
+        boton.setOpaque(true);
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return boton;
+    }
     
