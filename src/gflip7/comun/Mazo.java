@@ -1,13 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package gflip7.comun;
+package flip7.comun;
 
-/**
- *
- * @author Yaelll
- */
-public class Mazo {
+import java.io.Serializable;
+import java.util.*;
+
+public class Mazo implements Serializable {
+    private static final long serialVersionUID = 1L;
     
+    private List<Carta> cartas = new ArrayList<>();
+    private List<Carta> pilaDescarte = new ArrayList<>();
+    
+    public Mazo() { 
+        inicializarMazo(); 
+    }
 }
