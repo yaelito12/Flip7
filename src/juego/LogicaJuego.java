@@ -451,4 +451,99 @@ public class LogicaJuego {
         notificarCambioTurno();
     }
     
+     private int getSiguienteIndiceJugadorActivo(int actual) {
+        List<Jugador> jugadores = estadoJuego.getJugadores();
+        for (int i = 1; i <= jugadores.size(); i++) {
+            int idx = (actual + i) % jugadores.size();
+            if (jugadores.get(idx).estaActivo()) return idx;
+        }
+        return -1;
+    }
+    
+    private void terminarRonda() {
+        estadoJuego.setFase(EstadoJuego.Fase.FIN_RONDA);
+        
+        esperandoObjetivoAccion = false;
+        jugadorEsperandoAccion = -1;
+        cartaAccionPendiente = null;
+        procesandoVoltear3 = false;
+        idJugadorVoltear3 = -1;
+        cartasRestantesVoltear3 = 0;
+        
+        for (Jugador j : estadoJuego.getJugadores()) {
+            int puntajeRonda = j.calcularPuntajeRonda();
+            j.agregarAPuntajeTotal(puntajeRonda);
+        }
+        
+        int siguienteIndiceRepartidor = encontrarJugadorConMasPuntosRonda();
+        if (siguienteIndiceRepartidor != -1) {
+            estadoJuego.setIndiceRepartidor(siguienteIndiceRepartidor);
+        } else {
+            estadoJuego.setIndiceRepartidor((estadoJuego.getIndiceRepartidor() + 1) % estadoJuego.getJugadores().size());
+        }
+        
+        for (Jugador j : estadoJuego.getJugadores()) {
+            mazo.descartarTodas(j.getTodasLasCartas());
+        }
+        
+        notificarFinRonda();
+        
+        if (estadoJuego.esFinJuego()) {
+            terminarJuego();
+            return;
+        }
+        
+        estadoJuego.setNumeroRonda(estadoJuego.getNumeroRonda() + 1);
+    }
+    
+    private int encontrarJugadorConMasPuntosRonda() {
+        List<Jugador> jugadores = estadoJuego.getJugadores();
+        int maxPuntos = -1;
+        int indiceGanador = -1;
+        
+        for (int i = 0; i < jugadores.size(); i++) {
+            Jugador j = jugadores.get(i);
+            if (j.estaConectado()) {
+                int puntajeRonda = j.getPuntajeRonda();
+                if (puntajeRonda > maxPuntos) {
+                    maxPuntos = puntajeRonda;
+                    indiceGanador = i;
+                }
+            }
+        }
+        
+        return indiceGanador;
+    }
+    
+    public void iniciarSiguienteRonda() {
+        if (estadoJuego.esFinJuego()) {
+            terminarJuego();
+            return;
+        }
+        iniciarRonda();
+    }
+    
+    private void terminarJuego() {
+        estadoJuego.setFase(EstadoJuego.Fase.FIN_JUEGO);
+        notificarFinJuego(estadoJuego.getGanador());
+    }
+    
+    private void actualizarInfoMazo() {
+        estadoJuego.setTamanoMazo(mazo.getCartasRestantes());
+    }
+    
+    private void notificarCartaRepartida(int id, Carta c) { for (EscuchaEventosJuego e : escuchas) e.alRepartirCarta(id, c); }
+    private void notificarJugadorEliminado(int id, Carta c) { for (EscuchaEventosJuego e : escuchas) e.alEliminarJugador(id, c); }
+    private void notificarJugadorPlantado(int id) { for (EscuchaEventosJuego e : escuchas) e.alPlantarseJugador(id); }
+    private void notificarJugadorCongelado(int id) { for (EscuchaEventosJuego e : escuchas) e.alCongelarJugador(id); }
+    private void notificarCartaAccionRobada(int id, Carta c) { for (EscuchaEventosJuego e : escuchas) e.alRobarCartaAccion(id, c); }
+    private void notificarFinRonda() { for (EscuchaEventosJuego e : escuchas) e.alFinRonda(estadoJuego.getJugadores(), estadoJuego.getNumeroRonda()); }
+    private void notificarFinJuego(Jugador g) { for (EscuchaEventosJuego e : escuchas) e.alFinJuego(g); }
+    private void notificarCambioTurno() { Jugador c = estadoJuego.getJugadorActual(); if (c != null) for (EscuchaEventosJuego e : escuchas) e.alCambiarTurno(c.getId()); }
+    private void notificarActualizacionEstado() { for (EscuchaEventosJuego e : escuchas) e.alActualizarEstado(estadoJuego); }
+    private void notificarNecesitaObjetivoAccion(int id, Carta c, List<Jugador> a) { for (EscuchaEventosJuego e : escuchas) e.alNecesitarObjetivoAccion(id, c, a); }
+    
+    public EstadoJuego getEstadoJuego() { return estadoJuego; }
+    
 }
+
