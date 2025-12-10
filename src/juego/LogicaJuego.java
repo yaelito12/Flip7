@@ -111,4 +111,344 @@ public class LogicaJuego {
         actualizarInfoMazo();
     }
     
+     public void jugadorPide(int idJugador) {
+        if (esperandoObjetivoAccion) return;
+        
+        Jugador jugador = estadoJuego.getJugadorPorId(idJugador);
+        Jugador jugadorActual = estadoJuego.getJugadorActual();
+        
+        if (jugador == null || jugadorActual == null || jugadorActual.getId() != idJugador) return;
+        if (!jugador.estaActivo()) return;
+        
+        Carta carta = mazo.robarCarta();
+        if (carta == null) return;
+        
+        procesarCartaParaJugador(jugador, carta, false);
+        
+        if (jugador.tieneVoltear7() || estadoJuego.esFinRonda()) {
+            terminarRonda();
+            return;
+        }
+        
+        if (!esperandoObjetivoAccion && !procesandoVoltear3) {
+            avanzarTurno();
+            notificarActualizacionEstado();
+        }
+    }
+     
+     private void procesarCartaParaJugador(Jugador jugador, Carta carta, boolean esDeVoltear3) {
+        if (carta.esCartaAccion()) {
+            notificarCartaRepartida(jugador.getId(), carta);
+            notificarCartaAccionRobada(jugador.getId(), carta);
+            
+            if (carta.getTipo() == Carta.TipoCarta.SEGUNDA_OPORTUNIDAD) {
+                if (!jugador.tieneSegundaOportunidad()) {
+                    jugador.setCartaSegundaOportunidad(carta);
+                    notificarCartaRepartida(jugador.getId(), carta);
+                    actualizarInfoMazo();
+                    notificarActualizacionEstado();
+                    return;
+                }
+            }
+            
+            List<Jugador> objetivosValidos = getObjetivosValidosParaAccion(jugador, carta);
+            
+            if (objetivosValidos.isEmpty()) {
+                mazo.descartar(carta);
+                actualizarInfoMazo();
+                return;
+            }
+            
+            if (objetivosValidos.size() == 1) {
+                aplicarCartaAccion(objetivosValidos.get(0).getId(), carta, jugador.getId());
+                
+                if (procesandoVoltear3 && cartasRestantesVoltear3 > 0) {
+                    continuarVoltearTres(jugador);
+                }
+            } else {
+                esperandoObjetivoAccion = true;
+                jugadorEsperandoAccion = jugador.getId();
+                cartaAccionPendiente = carta;
+                notificarNecesitaObjetivoAccion(jugador.getId(), carta, objetivosValidos);
+            }
+        } else {
+            boolean exito = jugador.agregarCarta(carta);
+            if (!exito && carta.esCartaNumero()) {
+                manejarEliminacion(jugador, carta);
+            } else {
+                notificarCartaRepartida(jugador.getId(), carta);
+            }
+        }
+        actualizarInfoMazo();
+    }
+    
+    private List<Jugador> getObjetivosValidosParaAccion(Jugador desdeJugador, Carta carta) {
+        List<Jugador> validos = new ArrayList<>();
+        
+        for (Jugador j : estadoJuego.getJugadores()) {
+            if (!j.estaConectado()) continue;
+            if (!j.estaActivo() && carta.getTipo() != Carta.TipoCarta.SEGUNDA_OPORTUNIDAD) continue;
+            
+            if (carta.getTipo() == Carta.TipoCarta.SEGUNDA_OPORTUNIDAD) {
+                if (!j.tieneSegundaOportunidad()) {
+                    if (desdeJugador.tieneSegundaOportunidad() && j.getId() == desdeJugador.getId()) {
+                        continue;
+                    }
+                    validos.add(j);
+                }
+            } else {
+                if (j.estaActivo()) {
+                    validos.add(j);
+                }
+            }
+        }
+        
+        return validos;
+    }
+    
+    public void asignarCartaAccion(int desdeId, int objetivoId, Carta carta) {
+        if (!esperandoObjetivoAccion || jugadorEsperandoAccion != desdeId) return;
+        
+        Jugador objetivo = estadoJuego.getJugadorPorId(objetivoId);
+        Jugador desdeJugador = estadoJuego.getJugadorPorId(desdeId);
+        if (objetivo == null || desdeJugador == null) return;
+        
+        if (carta.getTipo() == Carta.TipoCarta.SEGUNDA_OPORTUNIDAD) {
+            if (objetivo.tieneSegundaOportunidad()) return;
+            if (desdeJugador.tieneSegundaOportunidad() && objetivoId == desdeId) return;
+        }
+        
+        esperandoObjetivoAccion = false;
+        jugadorEsperandoAccion = -1;
+        cartaAccionPendiente = null;
+        
+        aplicarCartaAccion(objetivoId, carta, desdeId);
+        
+        if (procesandoVoltear3 && cartasRestantesVoltear3 > 0) {
+            Jugador jugadorVoltear3 = estadoJuego.getJugadorPorId(idJugadorVoltear3);
+            if (jugadorVoltear3 != null && !jugadorVoltear3.estaEliminado()) {
+                continuarVoltearTres(jugadorVoltear3);
+                return;
+            }
+        }
+        
+        if (!procesandoVoltear3) {
+            avanzarTurnoDespuesDeAccion(desdeId);
+        }
+        
+        notificarActualizacionEstado();
+    }
+    
+    private void aplicarCartaAccion(int objetivoId, Carta carta, int desdeIdJugador) {
+        Jugador objetivo = estadoJuego.getJugadorPorId(objetivoId);
+        if (objetivo == null) return;
+        
+        switch (carta.getTipo()) {
+            case CONGELAR:
+                objetivo.agregarCartaAccion(carta);
+                objetivo.setCongelado(true);
+                notificarCartaRepartida(objetivoId, carta);
+                notificarJugadorCongelado(objetivoId);
+                break;
+                
+            case VOLTEAR_TRES:
+                objetivo.agregarCartaAccion(carta);
+                notificarCartaRepartida(objetivoId, carta);
+                
+                if (objetivoId == desdeIdJugador) {
+                    iniciarVoltearTres(objetivo);
+                } else {
+                    iniciarVoltearTresParaOtro(objetivo, desdeIdJugador);
+                }
+                break;
+                
+            case SEGUNDA_OPORTUNIDAD:
+                objetivo.setCartaSegundaOportunidad(carta);
+                notificarCartaRepartida(objetivoId, carta);
+                break;
+        }
+    }
+    
+    private void iniciarVoltearTres(Jugador jugador) {
+        procesandoVoltear3 = true;
+        idJugadorVoltear3 = jugador.getId();
+        cartasRestantesVoltear3 = 3;
+        continuarVoltearTres(jugador);
+    }
+    
+    private void iniciarVoltearTresParaOtro(Jugador jugadorObjetivo, int idJugadorOriginal) {
+        procesandoVoltear3 = true;
+        idJugadorVoltear3 = jugadorObjetivo.getId();
+        cartasRestantesVoltear3 = 3;
+        continuarVoltearTres(jugadorObjetivo);
+        
+        if (!procesandoVoltear3) {
+            avanzarTurnoDespuesDeAccion(idJugadorOriginal);
+        }
+    }
+    
+    private void continuarVoltearTres(Jugador jugador) {
+        while (cartasRestantesVoltear3 > 0 && !jugador.estaEliminado() && !jugador.tieneVoltear7()) {
+            Carta carta = mazo.robarCarta();
+            if (carta == null) break;
+            
+            cartasRestantesVoltear3--;
+            
+            if (carta.esCartaAccion()) {
+                notificarCartaRepartida(jugador.getId(), carta);
+                notificarCartaAccionRobada(jugador.getId(), carta);
+                
+                if (carta.getTipo() == Carta.TipoCarta.SEGUNDA_OPORTUNIDAD && !jugador.tieneSegundaOportunidad()) {
+                    jugador.setCartaSegundaOportunidad(carta);
+                    notificarActualizacionEstado();
+                    continue;
+                }
+                
+                List<Jugador> objetivosValidos = getObjetivosValidosParaAccion(jugador, carta);
+                
+                if (objetivosValidos.isEmpty()) {
+                    mazo.descartar(carta);
+                    continue;
+                }
+                
+                if (objetivosValidos.size() == 1) {
+                    aplicarCartaAccionDuranteVoltear3(objetivosValidos.get(0).getId(), carta, jugador);
+                    notificarActualizacionEstado();
+                } else {
+                    esperandoObjetivoAccion = true;
+                    jugadorEsperandoAccion = jugador.getId();
+                    cartaAccionPendiente = carta;
+                    notificarNecesitaObjetivoAccion(jugador.getId(), carta, objetivosValidos);
+                    return;
+                }
+            } else {
+                boolean exito = jugador.agregarCarta(carta);
+                notificarCartaRepartida(jugador.getId(), carta);
+                
+                if (!exito && carta.esCartaNumero()) {
+                    jugador.getCartasNumero().add(carta);
+                    jugador.setEliminado(true);
+                    notificarJugadorEliminado(jugador.getId(), carta);
+                    break;
+                }
+            }
+            
+            notificarActualizacionEstado();
+        }
+        
+        procesandoVoltear3 = false;
+        idJugadorVoltear3 = -1;
+        cartasRestantesVoltear3 = 0;
+        
+        if (jugador.tieneVoltear7()) {
+            terminarRonda();
+            return;
+        }
+        
+        avanzarTurno();
+        notificarActualizacionEstado();
+        actualizarInfoMazo();
+    }
+    
+    private void aplicarCartaAccionDuranteVoltear3(int objetivoId, Carta carta, Jugador jugadorVoltear3) {
+        Jugador objetivo = estadoJuego.getJugadorPorId(objetivoId);
+        if (objetivo == null) return;
+        
+        switch (carta.getTipo()) {
+            case CONGELAR:
+                objetivo.agregarCartaAccion(carta);
+                objetivo.setCongelado(true);
+                notificarCartaRepartida(objetivoId, carta);
+                notificarJugadorCongelado(objetivoId);
+                break;
+                
+            case VOLTEAR_TRES:
+                objetivo.agregarCartaAccion(carta);
+                notificarCartaRepartida(objetivoId, carta);
+                if (objetivoId == jugadorVoltear3.getId()) {
+                    cartasRestantesVoltear3 += 3;
+                } else {
+                    cartasRestantesVoltear3 += 3;
+                }
+                break;
+                
+            case SEGUNDA_OPORTUNIDAD:
+                objetivo.setCartaSegundaOportunidad(carta);
+                notificarCartaRepartida(objetivoId, carta);
+                break;
+        }
+    }
+    
+    private void avanzarTurnoDespuesDeAccion(int idJugadorAccion) {
+        List<Jugador> jugadoresActivos = estadoJuego.getJugadoresActivos();
+        
+        if (jugadoresActivos.size() <= 1) {
+            if (jugadoresActivos.size() == 1 && jugadoresActivos.get(0).getId() == idJugadorAccion) {
+                estadoJuego.setIndiceJugadorActual(getIndiceJugador(idJugadorAccion));
+                notificarCambioTurno();
+                return;
+            }
+            terminarRonda();
+            return;
+        }
+        
+        avanzarTurno();
+    }
+    
+    private int getIndiceJugador(int idJugador) {
+        List<Jugador> jugadores = estadoJuego.getJugadores();
+        for (int i = 0; i < jugadores.size(); i++) {
+            if (jugadores.get(i).getId() == idJugador) return i;
+        }
+        return 0;
+    }
+    
+    public void jugadorSePlanta(int idJugador) {
+        if (esperandoObjetivoAccion) return;
+        
+        Jugador jugador = estadoJuego.getJugadorPorId(idJugador);
+        Jugador jugadorActual = estadoJuego.getJugadorActual();
+        
+        if (jugador == null || jugadorActual == null || jugadorActual.getId() != idJugador) return;
+        if (!jugador.estaActivo()) return;
+        if (jugador.getCantidadCartasNumero() == 0 && jugador.getCartasModificador().isEmpty()) return;
+        
+        jugador.setPlantado(true);
+        notificarJugadorPlantado(idJugador);
+        
+        if (estadoJuego.esFinRonda()) {
+            terminarRonda();
+            return;
+        }
+        
+        avanzarTurno();
+        notificarActualizacionEstado();
+    }
+    
+     private void manejarEliminacion(Jugador jugador, Carta cartaEliminacion) {
+        if (jugador.tieneSegundaOportunidad()) {
+            mazo.descartar(jugador.usarSegundaOportunidad());
+            mazo.descartar(cartaEliminacion);
+            notificarCartaRepartida(jugador.getId(), cartaEliminacion);
+            return;
+        }
+        
+        jugador.getCartasNumero().add(cartaEliminacion);
+        notificarCartaRepartida(jugador.getId(), cartaEliminacion);
+        jugador.setEliminado(true);
+        notificarJugadorEliminado(jugador.getId(), cartaEliminacion);
+        
+        if (estadoJuego.esFinRonda()) terminarRonda();
+    }
+    
+    private void avanzarTurno() {
+        int siguiente = getSiguienteIndiceJugadorActivo(estadoJuego.getIndiceJugadorActual());
+        if (siguiente == -1) {
+            terminarRonda();
+            return;
+        }
+        estadoJuego.setIndiceJugadorActual(siguiente);
+        notificarCambioTurno();
+    }
+    
 }
