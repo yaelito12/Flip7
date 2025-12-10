@@ -90,4 +90,37 @@ public class SalaJuego implements Serializable {
     public int getCantidadTotal() {
         return nombresJugadores.size() + nombresEspectadores.size();
     }
+
+    public long getMinutosDesdeCreacion() {
+        return (System.currentTimeMillis() - tiempoCreacion) / (1000 * 60);
+    }
+
+    public String getEstadoTexto() {
+        if (juegoIniciado) {
+            return "En juego";
+        } else if (estaLlena()) {
+            return "Llena";
+        } else {
+            return "Esperando";
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return nombreSala + " (" + getJugadoresActuales() + "/" + maxJugadores + ")" +
+               (nombresEspectadores.isEmpty() ? "" : " +" + nombresEspectadores.size() + " obs");
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SalaJuego salaJuego = (SalaJuego) o;
+        return idSala != null && idSala.equals(salaJuego.idSala);
+    }
+    
+    @Override
+    public int hashCode() {
+        return idSala != null ? idSala.hashCode() : 0;
+    }
 }
