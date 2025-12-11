@@ -109,3 +109,106 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
                 }).start();
             }
         });
+        
+        panelLobby = new PanelLobby(new PanelLobby.LobbyListener() {
+
+            @Override
+            public void onSalir() {
+                if (cliente.estaConectado()) cliente.desconectar();
+                esHost = false;
+                panelLogin.limpiarCampos();
+                mostrarPanel("login");
+            }
+
+            @Override
+            public void onCrearSala(String nombreSala, String nombreJugador, int maxJugadores) {
+                cliente.crearSala(nombreSala, maxJugadores);
+            }
+
+            @Override
+            public void onUnirseSala(String idSala, String nombreJugador, boolean comoEspectador) {
+                esEspectador = comoEspectador;
+                if (comoEspectador) cliente.unirseSalaComoEspectador(idSala);
+                else cliente.unirseSala(idSala);
+            }
+
+            @Override
+            public void onActualizar() {
+                cliente.solicitarSalas();
+            }
+
+            @Override
+            public void onVerRankings() {
+                cliente.solicitarRankings();
+                mostrarPanel("rankings");
+            }
+        });
+
+        panelRankings = new PanelRankings(new PanelRankings.EscuchaRankings() {
+            @Override
+            public void alVolver() {
+                mostrarPanel("lobby");
+            }
+
+            @Override
+            public void alActualizar() {
+                cliente.solicitarRankings();
+            }
+        });
+
+        salaDeEspera = new SalaDeEspera(new SalaDeEspera.WaitingRoomListener() {
+
+            @Override
+            public void onReady() {
+                cliente.listo();
+            }
+
+            @Override
+            public void onLeaveRoom() {
+                if (esHost) {
+                    int confirm = JOptionPane.showConfirmDialog(
+                            VentanaJuego.this,
+                            "Eres el HOST. Si sales, la sala se cerrará.",
+                            "Advertencia",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        cliente.salirSala();
+                        esHost = false;
+                        mostrarPanel("lobby");
+                    }
+                } else {
+                    cliente.salirSala();
+                    mostrarPanel("lobby");
+                }
+            }
+
+            @Override
+            public void onJoinAsPlayer() {
+                String id = cliente.getIdSalaActual();
+                if (id != null) {
+                    cliente.salirSala();
+                    esEspectador = false;
+                    esHost = false;
+                    cliente.unirseSala(id);
+                }
+            }
+        });
+
+        panelJuego = crearPanelJuego();
+
+        contenedorPrincipal.add(panelLogin, "login");
+        contenedorPrincipal.add(panelLobby, "lobby");
+        contenedorPrincipal.add(panelRankings, "rankings");
+        contenedorPrincipal.add(salaDeEspera, "waiting");
+        contenedorPrincipal.add(panelJuego, "game");
+
+        setContentPane(contenedorPrincipal);
+        mostrarPanel("login");
+    }
+
+    private void mostrarPanel(String nombre) {
+        cardLayout.show(contenedorPrincipal, nombre);
+    }
