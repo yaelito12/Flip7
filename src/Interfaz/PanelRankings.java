@@ -139,3 +139,58 @@ public class PanelRankings extends JPanel {
         panel.add(scroll, BorderLayout.CENTER);
         return panel;
     }
+    private JPanel crearPanelBotones() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        panel.setOpaque(false);
+
+        botonActualizar = crearBoton("ACTUALIZAR", VERDE);
+        botonVolver = crearBoton("VOLVER", AZUL_OSCURO);
+
+        botonActualizar.addActionListener(e -> {
+            if (escucha != null) escucha.alActualizar();
+        });
+
+        botonVolver.addActionListener(e -> {
+            if (escucha != null) escucha.alVolver();
+        });
+
+        panel.add(botonVolver);
+        panel.add(botonActualizar);
+
+        return panel;
+    }
+
+    private JButton crearBoton(String texto, Color color) {
+        JButton btn = new JButton(texto) {
+            boolean hover = false;
+
+            {
+                addMouseListener(new MouseAdapter() {
+                    public void mouseEntered(MouseEvent e) { hover = true; repaint(); }
+                    public void mouseExited(MouseEvent e) { hover = false; repaint(); }
+                });
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                int w = getWidth(), h = getHeight();
+
+                g2.setColor(hover ? color.brighter() : color);
+                g2.fillRoundRect(0, 0, w, h, 14, 14);
+
+                g2.setColor(Color.WHITE);
+                g2.setFont(new Font("Arial", Font.BOLD, 14));
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(texto, (w - fm.stringWidth(texto)) / 2,
+                              (h + fm.getAscent() - fm.getDescent()) / 2);
+            }
+        };
+
+        btn.setPreferredSize(new Dimension(180, 50));
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        return btn;
+    }
