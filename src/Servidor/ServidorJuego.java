@@ -468,6 +468,38 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
         if (idJugador != null && sala.isJuegoIniciado()) logicaJuego.jugadorSePlanta(idJugador);
     }
     
+    public void asignarCartaAccion(int idCliente, int idJugadorObjetivo, Carta carta) {
+        Integer idJugador = clienteAIdJugador.get(idCliente);
+        if (idJugador != null && sala.isJuegoIniciado()) {
+            logicaJuego.asignarCartaAccion(idJugador, idJugadorObjetivo, carta);
+        }
+    }
+    
+    public void difundirChat(int idJugador, String nombre, String mensaje) {
+        difundir(MensajeJuego.chat(idJugador, nombre, mensaje));
+    }
+    
+    public void difundirActualizacionSala() {
+        MensajeJuego msg = MensajeJuego.salaActualizada(sala);
+        for (ManejadorCliente m : jugadores.values()) m.enviarMensaje(msg);
+        for (ManejadorCliente m : espectadores.values()) m.enviarMensaje(msg);
+    }
+    
+    private void difundir(MensajeJuego msg) {
+        for (ManejadorCliente m : jugadores.values()) m.enviarMensaje(msg);
+        for (ManejadorCliente m : espectadores.values()) m.enviarMensaje(msg);
+    }
+    
+    private void enviarAJugador(int idJugador, MensajeJuego msg) {
+        for (Map.Entry<Integer, Integer> entrada : clienteAIdJugador.entrySet()) {
+            if (entrada.getValue() == idJugador) {
+                ManejadorCliente manejador = jugadores.get(entrada.getKey());
+                if (manejador != null) manejador.enviarMensaje(msg);
+                break;
+            }
+        }
+    }
+
     public void alFinRonda(java.util.List<Jugador> jugadores, int ronda) {
         difundir(MensajeJuego.finRonda(jugadores, ronda));
         new Timer().schedule(
