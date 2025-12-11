@@ -67,6 +67,7 @@ public class MensajeJuego implements Serializable {
         RESPUESTA_RANKINGS
     }
 
+    // Campos de jugador y estado
     private int idJugador;
     private int idJugadorObjetivo;
     private int numeroRonda;
@@ -76,7 +77,7 @@ public class MensajeJuego implements Serializable {
     private List<Jugador> jugadores;
     private EstadoJuego estadoJuego;
 
-    
+    // Campos de salas, rankings y autenticación
     private String idSala;
     private String nombreSala;
     private int maxJugadores;
@@ -88,4 +89,57 @@ public class MensajeJuego implements Serializable {
     private List<String> jugadoresListos;
     private String nombreUsuario;
     private String contrasena;
+
+    public static MensajeJuego login(String nombreUsuario, String contrasena) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.LOGIN);
+        m.nombreUsuario = nombreUsuario;
+        m.contrasena = contrasena;
+        return m;
+    }
+
+    public static MensajeJuego registro(String nombreUsuario, String contrasena) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.REGISTRO);
+        m.nombreUsuario = nombreUsuario;
+        m.contrasena = contrasena;
+        return m;
+    }
+
+    public static MensajeJuego loginExitoso(Usuario usuario) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.LOGIN_EXITOSO);
+        m.usuario = usuario;
+        m.nombreJugador = usuario.getNombreUsuario();
+        return m;
+    }
+
+    public static MensajeJuego loginFallido(String razon) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.LOGIN_FALLIDO);
+        m.mensaje = razon;
+        return m;
+    }
+
+    public static MensajeJuego registroExitoso(Usuario usuario) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.REGISTRO_EXITOSO);
+        m.usuario = usuario;
+        m.nombreJugador = usuario.getNombreUsuario();
+        return m;
+    }
+
+    public static MensajeJuego registroFallido(String razon) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.REGISTRO_FALLIDO);
+        m.mensaje = razon;
+        return m;
+    }
+
+    public static MensajeJuego conectar(String nombre) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.CONECTAR);
+        m.nombreJugador = nombre;
+        return m;
+    }
+
+    public static MensajeJuego conectado(int id, String nombre) {
+        MensajeJuego m = new MensajeJuego(TipoMensaje.CONECTADO);
+        m.idJugador = id;
+        m.nombreJugador = nombre;
+        return m;
+    }
 }
