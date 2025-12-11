@@ -286,3 +286,105 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
         mesa.add(panelJugadores, BorderLayout.CENTER);
         return mesa;
     }
+    private JPanel crearCabeceraJuego() {
+        JPanel cabecera = new JPanel(new BorderLayout()) {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Color.WHITE);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setColor(new Color(100, 180, 246));
+                g2.fillRect(0, getHeight() - 4, getWidth(), 4);
+            }
+        };
+
+        cabecera.setBorder(new EmptyBorder(15, 25, 15, 25));
+
+        JLabel logo = new JLabel("FLIP 7");
+        logo.setFont(new Font("Arial", Font.BOLD, 32));
+        logo.setForeground(AZUL_OSCURO);
+
+        indicadorTurno = new JLabel("");
+        indicadorTurno.setFont(new Font("Arial", Font.BOLD, 16));
+        indicadorTurno.setForeground(AZUL_OSCURO);
+
+        cabecera.add(logo, BorderLayout.WEST);
+        cabecera.add(indicadorTurno, BorderLayout.EAST);
+
+        return cabecera;
+    }
+
+    private JPanel crearPanelDerecho() {
+        JPanel derecho = new JPanel(new BorderLayout(0, 12));
+        derecho.setOpaque(false);
+        derecho.setPreferredSize(new Dimension(250, 0));
+
+        panelInfo = new PanelInfoJuego();
+
+        JPanel panelChat = new JPanel(new BorderLayout(0, 8)) {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                g2.setColor(new Color(100, 150, 200, 30));
+                g2.fill(new RoundRectangle2D.Float(3, 3, getWidth(), getHeight(), 16, 16));
+
+                g2.setColor(Color.WHITE);
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 3, getHeight() - 3, 16, 16));
+
+                g2.setStroke(new BasicStroke(2f));
+                g2.setColor(new Color(100, 180, 246));
+                g2.draw(new RoundRectangle2D.Float(1, 1, getWidth() - 5, getHeight() - 5, 15, 15));
+            }
+        };
+
+        panelChat.setOpaque(false);
+        panelChat.setBorder(new EmptyBorder(15, 15, 15, 15));
+
+        JLabel tituloChat = new JLabel("CHAT");
+        tituloChat.setFont(new Font("Arial", Font.BOLD, 12));
+        tituloChat.setForeground(AZUL_OSCURO);
+
+        areaChat = new JTextArea();
+        areaChat.setEditable(false);
+        areaChat.setOpaque(false);
+        areaChat.setForeground(new Color(51, 65, 85));
+        areaChat.setFont(new Font("Arial", Font.PLAIN, 12));
+        areaChat.setLineWrap(true);
+
+        JScrollPane scrollChat = new JScrollPane(areaChat);
+        scrollChat.setOpaque(false);
+        scrollChat.getViewport().setOpaque(false);
+        scrollChat.setBorder(null);
+
+        entradaChat = new JTextField();
+        entradaChat.setBackground(new Color(248, 250, 252));
+        entradaChat.setForeground(new Color(30, 41, 59));
+        entradaChat.setCaretColor(AZUL_OSCURO);
+        entradaChat.setFont(new Font("Arial", Font.PLAIN, 12));
+        entradaChat.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(203, 213, 225), 2),
+                new EmptyBorder(10, 12, 10, 12)
+        ));
+
+        entradaChat.addActionListener(e -> {
+            String t = entradaChat.getText().trim();
+            if (!t.isEmpty() && cliente.estaConectado()) {
+                cliente.enviarChat(t);
+                entradaChat.setText("");
+            }
+        });
+
+        panelChat.add(tituloChat, BorderLayout.NORTH);
+        panelChat.add(scrollChat, BorderLayout.CENTER);
+        panelChat.add(entradaChat, BorderLayout.SOUTH);
+
+        derecho.add(panelInfo, BorderLayout.NORTH);
+        derecho.add(panelChat, BorderLayout.CENTER);
+
+        return derecho;
+    }
