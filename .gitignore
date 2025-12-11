@@ -37,6 +37,7 @@ nbproject/
 nbbuild/
 nbdist/
 .nb-gradle/
+nbproject/private/
 
 # Archivos de IDE - Visual Studio Code
 .vscode/
@@ -93,5 +94,3 @@ dependencies/
 *.cert
 *.p12
 *.jks
-
-# Archivos de configuracion sensible
