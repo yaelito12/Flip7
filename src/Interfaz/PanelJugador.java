@@ -1,7 +1,7 @@
 package Interfaz;
 
-import gflip7.commun.Jugador;
-import gflip7.commun.Carta;
+import gflip7.comun.Jugador;
+import gflip7.comun.Carta;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,13 +77,12 @@ public class PanelJugador extends JPanel {
     }
      private void dibujarHeader(Graphics2D g2, int w) {
 
-        // Fondo barra superior
         g2.setColor(new Color(241, 245, 249));
         g2.fill(new RoundRectangle2D.Float(3, 3, w - 10, 38, 13, 13));
         g2.fillRect(3, 20, w - 10, 20);
 
         Color ind;
-        if (jugador.estaFuera()) ind = ROJO;
+        if (jugador.estaEliminado()) ind = ROJO;
         else if (jugador.estaCongelado()) ind = CYAN;
         else if (jugador.estaPlantado()) ind = VERDE;
         else if (esMiTurno) ind = AZUL_OSCURO;
@@ -108,7 +107,7 @@ public class PanelJugador extends JPanel {
         Color color = null;
         Color fondo = null;
 
-        if (jugador.estaFuera()) {
+        if (jugador.estaEliminado()) {
             texto = "ELIMINADO";
             color = ROJO;
             fondo = new Color(254, 226, 226);

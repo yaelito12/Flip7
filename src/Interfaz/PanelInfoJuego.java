@@ -125,7 +125,7 @@ public class PanelInfoJuego extends JPanel {
         }
 
         actualizarEtiqueta(etiquetaFase, "FASE", fase, color);
-        actualizarEtiqueta(etiquetaMazo, "MAZO", e.getTamañoMazo() + " cartas", "#64748b");
+        actualizarEtiqueta(etiquetaMazo, "MAZO", e.getTamanoMazo() + " cartas", "#64748b");
     }
       public void registrar(String msg) {
         SwingUtilities.invokeLater(() -> {
