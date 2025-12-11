@@ -194,3 +194,34 @@ public class PanelRankings extends JPanel {
         btn.setContentAreaFilled(false);
         return btn;
     }
+     public void actualizarRankings(List<Usuario> usuarios) {
+        SwingUtilities.invokeLater(() -> {
+            modeloTabla.setRowCount(0);
+
+            if (usuarios == null || usuarios.isEmpty())
+                return;
+
+            usuarios.sort((a, b) -> b.getPuntajeTotal() - a.getPuntajeTotal());
+
+            for (int i = 0; i < usuarios.size(); i++) {
+                Usuario u = usuarios.get(i);
+
+                String porcentaje = "0%";
+                if (u.getPartidasJugadas() > 0) {
+                    int p = (int) ((u.getPartidasGanadas() * 100.0) / u.getPartidasJugadas());
+                    porcentaje = p + "%";
+                }
+
+                modeloTabla.addRow(new Object[]{
+                        i + 1,
+                        u.getNombreUsuario(),
+                        u.getPartidasJugadas(),
+                        u.getPartidasGanadas(),
+                        porcentaje,
+                        u.getPuntajeTotal()
+                });
+            }
+        });
+    }
+}
+
