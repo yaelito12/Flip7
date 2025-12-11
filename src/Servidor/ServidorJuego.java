@@ -173,3 +173,142 @@ public class ServidorJuego {
     
     public static void main(String[] args) { new ServidorJuego().iniciar(); }
 }
+
+class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
+    private SalaJuego sala;
+    private LogicaJuego logicaJuego;
+    private ServidorJuego servidor;
+    private Map<Integer, ManejadorCliente> jugadores = new ConcurrentHashMap<>();
+    private Map<Integer, ManejadorCliente> espectadores = new ConcurrentHashMap<>();
+    private Map<Integer, Integer> clienteAIdJugador = new ConcurrentHashMap<>();
+    private Set<Integer> jugadoresListos = new HashSet<>();
+    private Set<String> nombresJugadoresListos = new HashSet<>();
+    
+    public InstanciaSalaJuego(SalaJuego sala, ServidorJuego servidor) { this.sala = sala; this.servidor = servidor; this.logicaJuego = new LogicaJuego(); this.logicaJuego.agregarEscucha(this); }
+    public SalaJuego getSala() { return sala; }
+    public LogicaJuego getLogicaJuego() { return logicaJuego; }
+    public boolean estaVacia() { return jugadores.isEmpty() && espectadores.isEmpty(); }
+    
+    public int agregarJugador(ManejadorCliente manejador, String nombre) {
+        String nombreUnico = crearNombreUnico(nombre);
+        manejador.setNombreJugador(nombreUnico);
+        int idJugador = logicaJuego.agregarJugador(nombreUnico);
+        jugadores.put(manejador.getIdCliente(), manejador);
+        clienteAIdJugador.put(manejador.getIdCliente(), idJugador);
+        sala.agregarJugador(nombreUnico);
+        manejador.enviarMensaje(MensajeJuego.estadoJuego(logicaJuego.getEstadoJuego()));
+        MensajeJuego msgUnir = MensajeJuego.jugadorUnido(idJugador, nombreUnico);
+        for (ManejadorCliente m : jugadores.values()) if (m.getIdCliente() != manejador.getIdCliente()) m.enviarMensaje(msgUnir);
+        for (ManejadorCliente m : espectadores.values()) m.enviarMensaje(msgUnir);
+        return idJugador;
+    }
+    
+    public void agregarEspectador(ManejadorCliente manejador, String nombre) {
+        manejador.setNombreJugador(nombre + " (espec)");
+        espectadores.put(manejador.getIdCliente(), manejador);
+        sala.agregarEspectador(nombre);
+        manejador.enviarMensaje(MensajeJuego.estadoJuego(logicaJuego.getEstadoJuego()));
+    }
+    
+    private String crearNombreUnico(String nombre) {
+        Set<String> existentes = new HashSet<>();
+        for (Jugador j : logicaJuego.getEstadoJuego().getJugadores()) existentes.add(j.getNombre().toLowerCase());
+        if (!existentes.contains(nombre.toLowerCase())) return nombre;
+        int n = 2;
+        while (existentes.contains((nombre + n).toLowerCase())) n++;
+        return nombre + n;
+    }
+    
+    public void removerJugador(int idCliente) {
+        ManejadorCliente manejador = jugadores.remove(idCliente);
+        Integer idJugador = clienteAIdJugador.remove(idCliente);
+        jugadoresListos.remove(idCliente);
+        if (manejador != null) nombresJugadoresListos.remove(manejador.getNombreJugador());
+        if (manejador == null || idJugador == null) return;
+        String nombreJugador = manejador.getNombreJugador();
+        sala.removerJugador(nombreJugador);
+        logicaJuego.removerJugador(idJugador);
+        MensajeJuego msg = new MensajeJuego(MensajeJuego.TipoMensaje.JUGADOR_SALIO);
+        msg.setIdJugador(idJugador);
+        msg.setNombreJugador(nombreJugador);
+        difundir(msg);
+        if (sala.isJuegoIniciado() && jugadores.size() == 1) {
+            ManejadorCliente ganadorManejador = jugadores.values().iterator().next();
+            Integer ganadorIdJugador = null;
+            for (Map.Entry<Integer, Integer> entrada : clienteAIdJugador.entrySet()) if (jugadores.containsKey(entrada.getKey())) { ganadorIdJugador = entrada.getValue(); break; }
+            if (ganadorIdJugador != null) {
+                Jugador ganadorJugador = encontrarJugadorPorId(ganadorIdJugador);
+                Jugador salioJugador = encontrarJugadorPorId(idJugador);
+                if (ganadorJugador != null) {
+                    System.out.println("[JUEGO] " + ganadorJugador.getNombre() + " gana por abandono!");
+                    difundir(MensajeJuego.finJuego(logicaJuego.getEstadoJuego().getJugadores(), ganadorIdJugador));
+                    actualizarEstadisticasJugador(ganadorManejador, true, ganadorJugador);
+                    actualizarEstadisticasJugador(manejador, false, salioJugador);
+                    terminarJuego();
+                }
+            }
+        } else if (sala.isJuegoIniciado() && jugadores.isEmpty()) {
+            System.out.println("[JUEGO] Sala [" + sala.getIdSala() + "] sin jugadores, finalizando juego");
+            terminarJuego();
+        }
+        enviarListaJugadoresListos();
+    }
+    
+    private Jugador encontrarJugadorPorId(int idJugador) { for (Jugador j : logicaJuego.getEstadoJuego().getJugadores()) if (j.getId() == idJugador) return j; return null; }
+    
+    private void actualizarEstadisticasJugador(ManejadorCliente manejador, boolean gano, Jugador jugador) {
+        if (manejador == null || jugador == null) return;
+        int idUsuario = manejador.getIdUsuario();
+        if (idUsuario > 0) {
+            ManejadorBaseDatos bd = servidor.getBaseDatos();
+            int puntaje = jugador.getPuntajeTotal();
+            boolean actualizado = bd.actualizarEstadisticas(idUsuario, gano, puntaje);
+            if (actualizado) System.out.println("[BD] " + (gano ? "Victoria" : "Derrota") + " registrada: " + manejador.getNombreJugador() + " (Puntaje: " + puntaje + ")");
+            else System.err.println("[BD] Error actualizando stats de: " + manejador.getNombreJugador());
+        }
+    }
+    
+    private void terminarJuego() {
+        sala.setJuegoIniciado(false);
+        jugadoresListos.clear();
+        nombresJugadoresListos.clear();
+        for (Jugador j : logicaJuego.getEstadoJuego().getJugadores()) j.reiniciarParaNuevoJuego();
+        servidor.alFinJuego(sala.getIdSala());
+    }
+    
+    public void removerEspectador(int idCliente) { ManejadorCliente manejador = espectadores.remove(idCliente); if (manejador != null) sala.removerEspectador(manejador.getNombreJugador()); }
+    
+    public void jugadorListo(int idCliente) {
+        if (sala.isJuegoIniciado()) return;
+        if (!jugadores.containsKey(idCliente)) return;
+        ManejadorCliente manejador = jugadores.get(idCliente);
+        jugadoresListos.add(idCliente);
+        if (manejador != null) nombresJugadoresListos.add(manejador.getNombreJugador());
+        System.out.println("[LISTO] " + sala.getIdSala() + ": " + jugadoresListos.size() + "/" + jugadores.size());
+        enviarListaJugadoresListos();
+        if (jugadoresListos.size() >= 2 && jugadoresListos.size() == jugadores.size()) {
+            sala.setJuegoIniciado(true);
+            System.out.println("[JUEGO] Iniciando en [" + sala.getIdSala() + "]");
+            difundir(MensajeJuego.juegoInicia(logicaJuego.getEstadoJuego().getJugadores()));
+            logicaJuego.iniciarJuego();
+        }
+    }
+    
+    private void enviarListaJugadoresListos() {
+        List<String> listaListos = new ArrayList<>(nombresJugadoresListos);
+        MensajeJuego msg = MensajeJuego.jugadoresListos(listaListos);
+        for (ManejadorCliente m : jugadores.values()) m.enviarMensaje(msg);
+        for (ManejadorCliente m : espectadores.values()) m.enviarMensaje(msg);
+    }
+    
+    public void jugadorPide(int idCliente) { Integer idJugador = clienteAIdJugador.get(idCliente); if (idJugador != null && sala.isJuegoIniciado()) logicaJuego.jugadorPide(idJugador); }
+    public void jugadorSePlanta(int idCliente) { Integer idJugador = clienteAIdJugador.get(idCliente); if (idJugador != null && sala.isJuegoIniciado()) logicaJuego.jugadorSePlanta(idJugador); }
+    public void asignarCartaAccion(int idCliente, int idJugadorObjetivo, Carta carta) { Integer idJugador = clienteAIdJugador.get(idCliente); if (idJugador != null && sala.isJuegoIniciado()) logicaJuego.asignarCartaAccion(idJugador, idJugadorObjetivo, carta); }
+    public void difundirChat(int idJugador, String nombre, String mensaje) { difundir(MensajeJuego.chat(idJugador, nombre, mensaje)); }
+    public void difundirActualizacionSala() { MensajeJuego msg = MensajeJuego.salaActualizada(sala); for (ManejadorCliente m : jugadores.values()) m.enviarMensaje(msg); for (ManejadorCliente m : espectadores.values()) m.enviarMensaje(msg); }
+    private void difundir(MensajeJuego msg) { for (ManejadorCliente m : jugadores.values()) m.enviarMensaje(msg); for (ManejadorCliente m : espectadores.values()) m.enviarMensaje(msg); }
+    private void enviarAJugador(int idJugador, MensajeJuego msg) { for (Map.Entry<Integer, Integer> entrada : clienteAIdJugador.entrySet()) if (entrada.getValue() == idJugador) { ManejadorCliente manejador = jugadores.get(entrada.getKey()); if (manejador != null) manejador.enviarMensaje(msg); break; } }
+    private void difundirEstadoJuego() { difundir(MensajeJuego.estadoJuego(logicaJuego.getEstadoJuego())); }
+    
+   
+}
