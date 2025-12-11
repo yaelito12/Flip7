@@ -263,4 +263,87 @@ public class MensajeJuego implements Serializable {
         m.idJugador = idGanador;
         return m;
     }
+    public TipoMensaje getTipo() { 
+    return tipo; 
+}
+
+public int getIdJugador() { 
+    return idJugador; 
+}
+
+public void setIdJugador(int id) { 
+    this.idJugador = id; 
+}
+
+public int getIdJugadorObjetivo() { 
+    return idJugadorObjetivo; 
+}
+
+public int getNumeroRonda() { 
+    return numeroRonda; 
+}
+
+public String getNombreJugador() { 
+    return nombreJugador; 
+}
+
+public String getMensaje() { 
+    return mensaje; 
+}
+
+public Carta getCarta() { 
+    return carta; 
+}
+
+public List<Jugador> getJugadores() { 
+    return jugadores; 
+}
+
+public EstadoJuego getEstadoJuego() { 
+    return estadoJuego; 
+}
+
+public String getIdSala() { 
+    return idSala; 
+}
+
+public String getNombreSala() { 
+    return nombreSala; 
+}
+
+public int getMaxJugadores() { 
+    return maxJugadores; 
+}
+
+public boolean isEsEspectador() { 
+    return esEspectador; 
+}
+
+public List<SalaJuego> getSalas() { 
+    return salas; 
+}
+
+public SalaJuego getSala() { 
+    return sala; 
+}
+
+public Usuario getUsuario() { 
+    return usuario; 
+}
+
+public List<Usuario> getRankings() { 
+    return rankings; 
+}
+
+public List<String> getJugadoresListos() { 
+    return jugadoresListos; 
+}
+
+public String getNombreUsuario() { 
+    return nombreUsuario; 
+}
+
+public String getContrasena() { 
+    return contrasena; 
+}
 }
