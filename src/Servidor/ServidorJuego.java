@@ -37,7 +37,6 @@ public class ServidorJuego {
             while (ejecutando) {
                 try {
                     Socket cliente = socketServidor.accept();
-
                     ejecutor.execute(
                         new ManejadorCliente(cliente, this, siguienteIdCliente++)
                     );
@@ -46,12 +45,14 @@ public class ServidorJuego {
                     if (ejecutando) e.printStackTrace();
                 }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    // =========================================================================
+    // LOGIN / REGISTRO
+    // =========================================================================
     public synchronized void manejarLogin(ManejadorCliente manejador, String nombre, String contrasena) {
 
         if (!esUsuarioValido(nombre)) {
@@ -65,7 +66,6 @@ public class ServidorJuego {
         }
 
         Usuario usuario = baseDatos.login(nombre, contrasena);
-
         if (usuario != null) {
             manejador.setNombreJugador(nombre);
             manejador.setIdUsuario(usuario.getId());
@@ -77,19 +77,16 @@ public class ServidorJuego {
     }
 
     public void manejarRegistro(ManejadorCliente manejador, String nombre, String contrasena) {
-
         if (!esUsuarioValido(nombre)) {
             manejador.enviarMensaje(MensajeJuego.registroFallido("Usuario invalido"));
             return;
         }
-
         if (contrasena == null || contrasena.length() < 4) {
             manejador.enviarMensaje(MensajeJuego.registroFallido("Contrasena muy corta"));
             return;
         }
 
-        Usuario usuario = baseDatos.registrar(nombre.trim(), contrasena);
-
+        Usuario usuario = baseDatos.registrar(nombre, contrasena);
         if (usuario != null) {
             manejador.setNombreJugador(nombre);
             manejador.setIdUsuario(usuario.getId());
@@ -101,9 +98,9 @@ public class ServidorJuego {
     }
 
     private boolean esUsuarioValido(String nombre) {
-        if (nombre == null) return false;
-        if (nombre.contains(" ")) return false;
-        return nombre.matches("^[a-zA-Z0-9]{3,15}$");
+        return nombre != null &&
+               !nombre.contains(" ") &&
+               nombre.matches("^[a-zA-Z0-9]{3,15}$");
     }
 
     private boolean usuarioYaConectado(String nombre) {
@@ -113,17 +110,24 @@ public class ServidorJuego {
         return false;
     }
 
+    // =========================================================================
+    // CLIENTES
+    // =========================================================================
+
     public void registrarCliente(ManejadorCliente manejador) {
         todosClientes.put(manejador.obtenerIdCliente(), manejador);
     }
 
     public void desregistrarCliente(int idCliente) {
         ManejadorCliente manejador = todosClientes.remove(idCliente);
-        
         if (manejador != null && manejador.getIdSalaActual() != null) {
             salirSala(idCliente, manejador.getIdSalaActual());
         }
     }
+
+    // =========================================================================
+    // SALAS
+    // =========================================================================
 
     public List<SalaJuego> obtenerTodasLasSalas() {
         List<SalaJuego> lista = new ArrayList<>();
@@ -150,12 +154,13 @@ public class ServidorJuego {
         int idJugador = instancia.agregarJugador(manejador, nombreJugador);
         manejador.setIdSalaActual(idSala);
         manejador.setIdJugador(idJugador);
+        manejador.setEspectador(false);
 
         difundirListaSalas();
         return sala;
     }
 
-    public boolean unirseSala(int idCliente, String idSala, String nombreJugador) {
+    public boolean unirseSala(int idCliente, String idSala, String nombreJugador, boolean comoEspectador) {
 
         ManejadorCliente manejador = todosClientes.get(idCliente);
         InstanciaSalaJuego instancia = salas.get(idSala);
@@ -163,46 +168,57 @@ public class ServidorJuego {
         if (manejador == null || instancia == null) return false;
 
         SalaJuego sala = instancia.getSala();
+        if (!comoEspectador && sala.estaLlena()) return false;
 
-        if (sala.estaLlena()) return false;
-        if (sala.isJuegoIniciado()) return false;
+        if (!comoEspectador) {
+            int idJugador = instancia.agregarJugador(manejador, nombreJugador);
+            manejador.setIdSalaActual(idSala);
+            manejador.setIdJugador(idJugador);
+            manejador.setEspectador(false);
+            manejador.enviarMensaje(MensajeJuego.salaUnida(sala, idJugador));
+        } else {
+            instancia.agregarEspectador(manejador, nombreJugador);
+            manejador.setIdSalaActual(idSala);
+            manejador.setEspectador(true);
+            manejador.enviarMensaje(MensajeJuego.salaUnida(sala, -1));
+        }
 
-        int idJugador = instancia.agregarJugador(manejador, nombreJugador);
-        manejador.setIdSalaActual(idSala);
-        manejador.setIdJugador(idJugador);
-
-        manejador.enviarMensaje(MensajeJuego.salaUnida(sala, idJugador));
         instancia.difundirActualizacionSala();
         difundirListaSalas();
         return true;
     }
 
     public void salirSala(int idCliente, String idSala) {
+
         InstanciaSalaJuego instancia = salas.get(idSala);
         if (instancia == null) return;
 
-        instancia.removerJugador(idCliente);
-
         ManejadorCliente manejador = todosClientes.get(idCliente);
-        if (manejador != null) {
-            manejador.setIdSalaActual(null);
-            manejador.setIdJugador(-1);
-        }
 
-        if (instancia.estaVacia()) {
-            salas.remove(idSala);
-        } else {
-            instancia.difundirActualizacionSala();
-        }
+        if (manejador != null && manejador.esEspectador()) instancia.removerEspectador(idCliente);
+        else instancia.removerJugador(idCliente);
+
+        manejador.setIdSalaActual(null);
+        manejador.setIdJugador(-1);
+
+        if (instancia.estaVacia()) salas.remove(idSala);
+        else instancia.difundirActualizacionSala();
 
         difundirListaSalas();
     }
 
-    public void enviarListaSalas(int idCliente) {
-        ManejadorCliente manejador = todosClientes.get(idCliente);
-        if (manejador != null) {
-            manejador.enviarMensaje(MensajeJuego.listaSalas(obtenerTodasLasSalas()));
+    // CHAT
+    public void difundirChat(int idCliente, String idSala, String mensaje) {
+        InstanciaSalaJuego instancia = salas.get(idSala);
+        ManejadorCliente cliente = todosClientes.get(idCliente);
+        if (instancia != null && cliente != null) {
+            instancia.difundirChat(cliente.getIdJugador(), cliente.getNombreJugador(), mensaje);
         }
+    }
+
+    public void enviarListaSalas(int idCliente) {
+        ManejadorCliente m = todosClientes.get(idCliente);
+        if (m != null) m.enviarMensaje(MensajeJuego.listaSalas(obtenerTodasLasSalas()));
     }
 
     private void difundirListaSalas() {
@@ -214,27 +230,17 @@ public class ServidorJuego {
         }
     }
 
-    public void jugadorListo(int idCliente, String idSala) {
-        InstanciaSalaJuego instancia = salas.get(idSala);
-        if (instancia != null) instancia.jugadorListo(idCliente);
-    }
-
-    public void jugadorPide(int idCliente, String idSala) {
-        InstanciaSalaJuego instancia = salas.get(idSala);
-        if (instancia != null) instancia.jugadorPide(idCliente);
-    }
-
-    public void jugadorSePlanta(int idCliente, String idSala) {
-        InstanciaSalaJuego instancia = salas.get(idSala);
-        if (instancia != null) instancia.jugadorSePlanta(idCliente);
-    }
-
     public ManejadorBaseDatos getBaseDatos() { return baseDatos; }
 
     public static void main(String[] args) {
         new ServidorJuego().iniciar();
     }
 }
+
+// ============================================================================
+// INSTANCIA DE SALA (ESPECTADORES + CHAT)
+// ============================================================================
+
 class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
 
     private SalaJuego sala;
@@ -242,8 +248,8 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
     private ServidorJuego servidor;
 
     private Map<Integer, ManejadorCliente> jugadores = new ConcurrentHashMap<>();
+    private Map<Integer, ManejadorCliente> espectadores = new ConcurrentHashMap<>();
     private Map<Integer, Integer> clienteAIdJugador = new ConcurrentHashMap<>();
-
     private Set<Integer> jugadoresListos = new HashSet<>();
 
     public InstanciaSalaJuego(SalaJuego sala, ServidorJuego servidor) {
@@ -255,22 +261,58 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
 
     public SalaJuego getSala() { return sala; }
 
-    public boolean estaVacia() { return jugadores.isEmpty(); }
+    public boolean estaVacia() {
+        return jugadores.isEmpty() && espectadores.isEmpty();
+    }
+
+    // ========================================================
+    // NOMBRES ÚNICOS EN LA SALA
+    // ========================================================
+
+    private String generarNombreUnico(String nombre) {
+        Set<String> existentes = new HashSet<>();
+
+        for (Jugador j : logica.getEstadoJuego().getJugadores())
+            existentes.add(j.getNombre().toLowerCase());
+
+        if (!existentes.contains(nombre.toLowerCase())) return nombre;
+
+        int n = 2;
+        while (existentes.contains((nombre + n).toLowerCase())) n++;
+        return nombre + n;
+    }
+
+    // ========================================================
+    // AGREGAR JUGADORES / ESPECTADORES
+    // ========================================================
 
     public int agregarJugador(ManejadorCliente manejador, String nombre) {
 
-        int idJugador = logica.agregarJugador(nombre);
+        String nombreUnico = generarNombreUnico(nombre);
 
+        manejador.setNombreJugador(nombreUnico);
+
+        int idJugador = logica.agregarJugador(nombreUnico);
         jugadores.put(manejador.obtenerIdCliente(), manejador);
         clienteAIdJugador.put(manejador.obtenerIdCliente(), idJugador);
 
-        sala.agregarJugador(nombre);
+        sala.agregarJugador(nombreUnico);
 
+        difundir(MensajeJuego.jugadorUnido(idJugador, nombreUnico));
         return idJugador;
     }
 
-    public void removerJugador(int idCliente) {
+    public void agregarEspectador(ManejadorCliente manejador, String nombre) {
+        manejador.setNombreJugador(nombre + " (espec)");
+        espectadores.put(manejador.obtenerIdCliente(), manejador);
+        sala.agregarEspectador(nombre);
+    }
 
+    // ========================================================
+    // REMOVER
+    // ========================================================
+
+    public void removerJugador(int idCliente) {
         ManejadorCliente manejador = jugadores.remove(idCliente);
         Integer idJugador = clienteAIdJugador.remove(idCliente);
 
@@ -278,41 +320,67 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
 
         sala.removerJugador(manejador.getNombreJugador());
         logica.removerJugador(idJugador);
+
+        difundir(MensajeJuego.jugadorSalio(idJugador, manejador.getNombreJugador()));
+    }
+
+    public void removerEspectador(int idCliente) {
+        ManejadorCliente m = espectadores.remove(idCliente);
+        if (m != null) sala.removerEspectador(m.getNombreJugador());
+    }
+
+    // ========================================================
+    // CHAT
+    // ========================================================
+
+    public void difundirChat(int idJugador, String nombre, String mensaje) {
+        difundir(MensajeJuego.chat(idJugador, nombre, mensaje));
+    }
+
+    // ========================================================
+    // DIFUSIÓN GENERAL
+    // ========================================================
+
+    public void difundir(MensajeJuego msg) {
+        for (ManejadorCliente m : jugadores.values()) m.enviarMensaje(msg);
+        for (ManejadorCliente m : espectadores.values()) m.enviarMensaje(msg);
     }
 
     public void difundirActualizacionSala() {
         MensajeJuego msg = MensajeJuego.salaActualizada(sala);
-        for (ManejadorCliente m : jugadores.values()) m.enviarMensaje(msg);
+        difundir(msg);
     }
 
+    // ========================================================
+    // LOGICA DE JUGADORES LISTOS (igual que commit 3)
+    // ========================================================
 
     public void jugadorListo(int idCliente) {
         jugadoresListos.add(idCliente);
-
         if (jugadoresListos.size() == jugadores.size() && jugadores.size() >= 2) {
             sala.setJuegoIniciado(true);
             logica.iniciarJuego();
         }
     }
 
-    public void jugadorPide(int idCliente) {
-        Integer id = clienteAIdJugador.get(idCliente);
-        if (id != null) logica.jugadorPide(id);
-    }
-
-    public void jugadorSePlanta(int idCliente) {
-        Integer id = clienteAIdJugador.get(idCliente);
-        if (id != null) logica.jugadorSePlanta(id);
-    }
-
+    @Override
     public void alRepartirCarta(int id, Carta c) {}
+    @Override
     public void alEliminarJugador(int id, Carta c) {}
+    @Override
     public void alPlantarseJugador(int id) {}
+    @Override
     public void alCongelarJugador(int id) {}
+    @Override
     public void alRobarCartaAccion(int id, Carta c) {}
+    @Override
     public void alCambiarTurno(int id) {}
+    @Override
     public void alActualizarEstado(EstadoJuego e) {}
+    @Override
     public void alNecesitarObjetivoAccion(int id, Carta c, List<Jugador> candidatos) {}
+    @Override
     public void alFinRonda(List<Jugador> jugadores, int ronda) {}
+    @Override
     public void alFinJuego(Jugador ganador) {}
 }
