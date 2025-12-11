@@ -574,4 +574,302 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
             panelJugadores.repaint();
         });
     }
+@Override
+    public void alConectar(int idJugador, String nombreJugador) {
+        // No hace nada aquí.
+    }
 
+    @Override
+    public void alDesconectar() {
+        SwingUtilities.invokeLater(() -> {
+            juegoIniciado = false;
+            esMiTurno = false;
+            esHost = false;
+            mostrarPanel("login");
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Desconectado del servidor",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE);
+        });
+    }
+
+    @Override
+    public void alLoginExitoso(Usuario usuario) {
+        SwingUtilities.invokeLater(() -> {
+            miIdJugador = usuario.getId();
+            cliente.setNombreJugador(usuario.getNombreUsuario());
+            panelLobby.setPlayerName(usuario.getNombreUsuario());
+            mostrarPanel("lobby");
+            panelInfo.registrar("Conexión establecida");
+            panelInfo.registrar("  Partidas: " + usuario.getPartidasJugadas()
+                    + " | Ganadas: " + usuario.getPartidasGanadas());
+        });
+    }
+
+    @Override
+    public void alLoginFallido(String razon) {
+        panelLogin.alFallarInicioSesion(razon);
+    }
+
+    @Override
+    public void alRegistroExitoso(Usuario usuario) {
+        SwingUtilities.invokeLater(() -> {
+            panelLogin.restablecerBotones();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Usuario registrado correctamente",
+                    "Registro Exitoso",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            miIdJugador = usuario.getId();
+            cliente.setNombreJugador(usuario.getNombreUsuario());
+            panelLobby.setPlayerName(usuario.getNombreUsuario());
+            mostrarPanel("lobby");
+            panelInfo.registrar("Registro exitoso");
+        });
+    }
+
+    @Override
+    public void alRegistroFallido(String razon) {
+        panelLogin.alFallarRegistro(razon);
+    }
+
+    @Override
+    public void alUnirseJugador(int idJugador, String nombreJugador) {
+        panelInfo.registrar("+ " + nombreJugador + " se unió");
+    }
+
+    @Override
+    public void alSalirJugador(int idJugador, String nombreJugador) {
+        SwingUtilities.invokeLater(() -> {
+            panelInfo.registrar("- " + nombreJugador + " salió");
+
+            PanelJugador panel = panelesJugadores.remove(idJugador);
+            if (panel != null) {
+                panelJugadores.remove(panel);
+                JPanel vacio = new JPanel();
+                vacio.setOpaque(false);
+                panelJugadores.add(vacio);
+                panelJugadores.revalidate();
+                panelJugadores.repaint();
+            }
+        });
+    }
+
+    @Override
+    public void alIniciarJuego(List<Jugador> jugadores) {
+        SwingUtilities.invokeLater(() -> {
+            juegoIniciado = true;
+            botonListo.setEnabled(false);
+            botonListo.setText("EN JUEGO");
+            mostrarPanel("game");
+            panelInfo.registrar("\nJUEGO INICIADO\n");
+        });
+    }
+
+    @Override
+    public void alIniciarRonda(int numeroRonda) {
+        panelInfo.registrar("\nRONDA " + numeroRonda);
+    }
+
+    @Override
+    public void alTuTurno(int idJugador) {
+        SwingUtilities.invokeLater(() -> {
+            esMiTurno = (idJugador == miIdJugador);
+            actualizarControles();
+
+            if (esMiTurno && !esEspectador) {
+                indicadorTurno.setText("TU TURNO");
+                Toolkit.getDefaultToolkit().beep();
+            } else {
+                EstadoJuego s = cliente.getEstadoJuegoActual();
+                if (s != null) {
+                    Jugador j = s.getJugadorPorId(idJugador);
+                    if (j != null)
+                        indicadorTurno.setText("Turno: " + j.getNombre());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void alRepartirCarta(int idJugador, Carta carta) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) panelInfo.registrar(j.getNombre() + " ← " + carta);
+        }
+    }
+
+    @Override
+    public void alJugadorEliminado(int idJugador, Carta carta) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) panelInfo.registrar("X " + j.getNombre() + " eliminado con " + carta);
+        }
+        if (idJugador == miIdJugador) {
+            esMiTurno = false;
+            actualizarControles();
+        }
+    }
+
+    @Override
+    public void alJugadorPlantado(int idJugador) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) panelInfo.registrar(j.getNombre() + " se plantó");
+        }
+        if (idJugador == miIdJugador) {
+            esMiTurno = false;
+            actualizarControles();
+        }
+    }
+
+    @Override
+    public void alJugadorCongelado(int idJugador) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) panelInfo.registrar(j.getNombre() + " congelado");
+        }
+    }
+
+    @Override
+    public void alRobarCartaAccion(int idJugador, Carta carta) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) panelInfo.registrar("* " + j.getNombre() + " -> " + carta);
+        }
+    }
+
+    @Override
+    public void alElegirObjetivoAccion(Carta carta, List<Jugador> jugadoresActivos) {
+
+        if (esEspectador) return;
+
+        SwingUtilities.invokeLater(() -> {
+
+            botonPedir.setEnabled(false);
+            botonPlantarse.setEnabled(false);
+
+            String[] opciones = new String[jugadoresActivos.size()];
+            for (int i = 0; i < jugadoresActivos.size(); i++)
+                opciones[i] = jugadoresActivos.get(i).getNombre();
+
+            String seleccion = null;
+
+            while (seleccion == null) {
+                seleccion = (String) JOptionPane.showInputDialog(
+                        this,
+                        "¿A quién asignas " + carta + "?\n(Debes elegir obligatoriamente)",
+                        "Carta de Acción",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        opciones,
+                        opciones[0]
+                );
+
+                if (seleccion == null) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Debes elegir un objetivo para continuar",
+                            "Selección Obligatoria",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                }
+            }
+
+            for (Jugador j : jugadoresActivos) {
+                if (j.getNombre().equals(seleccion)) {
+                    cliente.asignarCartaAccion(j.getId(), carta);
+                    break;
+                }
+            }
+        });
+    }
+
+    @Override
+    public void alFinRonda(List<Jugador> jugadores, int numeroRonda) {
+        SwingUtilities.invokeLater(() -> {
+            esMiTurno = false;
+            indicadorTurno.setText("");
+            actualizarControles();
+
+            panelInfo.registrar("\nFIN RONDA " + numeroRonda);
+            for (Jugador j : jugadores)
+                panelInfo.registrar("  " + j.getNombre() + ": +" + j.getPuntajeRonda()
+                        + " → " + j.getPuntajeTotal());
+            panelInfo.mostrarPuntuaciones(jugadores);
+        });
+    }
+
+    @Override
+    public void alFinJuego(List<Jugador> jugadores, int idGanador) {
+        SwingUtilities.invokeLater(() -> {
+
+            juegoIniciado = false;
+            esMiTurno = false;
+            actualizarControles();
+
+            Jugador ganador = null;
+            for (Jugador j : jugadores)
+                if (j.getId() == idGanador) ganador = j;
+
+            String msg = ganador != null
+                    ? ganador.getNombre() + " gana con " + ganador.getPuntajeTotal() + " pts"
+                    : "Fin del juego";
+
+            panelInfo.registrar("\n" + msg + "\n");
+
+            int opcion = JOptionPane.showOptionDialog(
+                    this,
+                    msg + "\n\n¿Jugar otra partida?",
+                    "Fin del Juego",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    new String[]{"Revancha", "Salir"},
+                    "Revancha"
+            );
+
+            if (opcion == 0) {
+                salaDeEspera.reset();
+                limpiarEstadoJuego();
+                mostrarPanel("waiting");
+            } else {
+                cliente.salirSala();
+                limpiarEstadoJuego();
+                mostrarPanel("lobby");
+            }
+        });
+    }
+
+    @Override
+    public void alActualizarEstado(EstadoJuego estado) {
+        actualizarPanelesJugadores(estado);
+    }
+
+    @Override
+    public void alMensajeChat(int idJugador, String nombreJugador, String mensaje) {
+        SwingUtilities.invokeLater(() -> {
+            areaChat.append(nombreJugador + ": " + mensaje + "\n");
+            areaChat.setCaretPosition(areaChat.getDocument().getLength());
+        });
+    }
+
+    @Override
+    public void alError(String mensaje) {
+        SwingUtilities.invokeLater(() -> {
+            panelInfo.registrar("! " + mensaje);
+            JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        });
+    }
+
+    @Override
+    public void alListaSalas(List<SalaJuego> salas) {
+        panelLobby.updateRoomList(salas);
+    }
