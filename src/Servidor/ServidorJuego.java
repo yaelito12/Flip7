@@ -238,7 +238,50 @@ public class ServidorJuego {
         if (instancia != null) instancia.jugadorPide(idCliente);
     }
     
-
+    public void jugadorSePlanta(int idCliente, String idSala) {
+        InstanciaSalaJuego instancia = salas.get(idSala);
+        if (instancia != null) instancia.jugadorSePlanta(idCliente);
+    }
+    
+    public void asignarCartaAccion(int idCliente, String idSala, int idObjetivo, Carta carta) {
+        InstanciaSalaJuego instancia = salas.get(idSala);
+        if (instancia != null) instancia.asignarCartaAccion(idCliente, idObjetivo, carta);
+    }
+    
+    public void difundirChat(int idCliente, String idSala, String mensaje) {
+        InstanciaSalaJuego instancia = salas.get(idSala);
+        ManejadorCliente manejador = todosClientes.get(idCliente);
+        if (instancia != null && manejador != null) {
+            instancia.difundirChat(manejador.getIdJugador(), manejador.getNombreJugador(), mensaje);
+        }
+    }
+    
+    public void enviarListaSalas(int idCliente) {
+        ManejadorCliente manejador = todosClientes.get(idCliente);
+        if (manejador != null) manejador.enviarMensaje(MensajeJuego.listaSalas(obtenerTodasLasSalas()));
+    }
+    
+    private void difundirListaSalas() {
+        List<SalaJuego> todas = obtenerTodasLasSalas();
+        for (ManejadorCliente manejador : todosClientes.values()) {
+            if (manejador.getIdSalaActual() == null) {
+                manejador.enviarMensaje(MensajeJuego.listaSalas(todas));
+            }
+        }
+    }
+    
+    public void alFinJuego(String idSala) {
+        InstanciaSalaJuego instancia = salas.get(idSala);
+        if (instancia != null) {
+            instancia.getSala().setJuegoIniciado(false);
+            difundirListaSalas();
+        }
+    }
+    
+    public ManejadorBaseDatos getBaseDatos() {
+        return baseDatos;
+    }
+    
     public static void main(String[] args) {
         new ServidorJuego().iniciar();
     }
