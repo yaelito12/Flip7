@@ -1,6 +1,3 @@
-<<<<<<< OURS
-/nbproject/private/
-=======
 # Archivos compilados de Java
 *.class
 *.jar
@@ -16,7 +13,7 @@
 *.sqlite
 *.sqlite3
 
-# Directorios de compilacion
+# Directorios de compilación
 bin/
 build/
 target/
@@ -40,12 +37,13 @@ nbproject/
 nbbuild/
 nbdist/
 .nb-gradle/
+nbproject/private/
 
 # Archivos de IDE - Visual Studio Code
 .vscode/
 *.code-workspace
 
-# Archivos de sistema operativo
+# Archivos generados por sistema operativo
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -73,29 +71,26 @@ dependency-reduced-pom.xml
 gradle-app.setting
 !gradle-wrapper.jar
 
-# Archivos de configuracion local
+# Configuración local
 config.properties
 *.local
 
-# Archivos de prueba
+# Resultados de pruebas
 test-output/
 *.test
 
-# Archivos de documentacion generada
+# Documentación generada
 javadoc/
 docs/generated/
 
-# Archivos de dependencias
+# Dependencias externas
 lib/
 libs/
 dependencies/
 
-# Archivos de certificados y claves
+# Certificados y claves
 *.key
 *.pem
 *.cert
 *.p12
 *.jks
-
-# Archivos de configuracion sensible
->>>>>>> THEIRS
