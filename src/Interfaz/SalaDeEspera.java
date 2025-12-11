@@ -301,3 +301,34 @@ public void setPlayerReady(String name) {
 
         return entry;
     }
+    
+    public void setSpectator(boolean spectator) {
+        this.isSpectator = spectator;
+        this.isReady = false;
+        this.readyPlayers.clear();
+
+        if (spectator) {
+            readyBtn.setText("OBSERVANDO");
+            readyBtn.setEnabled(false);
+        } else {
+            readyBtn.setText("LISTO");
+            readyBtn.setEnabled(true);
+        }
+        updateStatus();
+    }
+
+    public void reset() {
+        isReady = false;
+        readyPlayers.clear();
+
+        if (isSpectator) {
+            readyBtn.setText("OBSERVANDO");
+            readyBtn.setEnabled(false);
+        } else {
+            readyBtn.setText("LISTO");
+            readyBtn.setEnabled(true);
+        }
+
+        updateStatus();
+    }
+}
