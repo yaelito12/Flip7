@@ -499,6 +499,27 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
             }
         }
     }
+    
+    private void difundirEstadoJuego() {
+        difundir(MensajeJuego.estadoJuego(logicaJuego.getEstadoJuego()));
+    }
+    
+    public void alRepartirCarta(int id, Carta c) {
+        difundir(MensajeJuego.cartaRepartida(id, c));
+        difundirEstadoJuego();
+    }
+    
+    public void alEliminarJugador(int id, Carta c) {
+        difundir(MensajeJuego.jugadorEliminado(id, c));
+        difundirEstadoJuego();
+    }
+    
+    public void alPlantarseJugador(int id) {
+        MensajeJuego m = new MensajeJuego(MensajeJuego.TipoMensaje.JUGADOR_PLANTADO);
+        m.setIdJugador(id);
+        difundir(m);
+        difundirEstadoJuego();
+    }
 
     public void alFinRonda(java.util.List<Jugador> jugadores, int ronda) {
         difundir(MensajeJuego.finRonda(jugadores, ronda));
