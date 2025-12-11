@@ -157,3 +157,51 @@ public class ManejadorCliente implements Runnable {
             if (socket != null && !socket.isClosed()) socket.close(); 
         } catch (IOException e) {}
     }
+    public int getIdCliente() { 
+        return idCliente; 
+    }
+    
+    public int getIdJugador() { 
+        return idJugador; 
+    }
+    
+    public void setIdJugador(int id) { 
+        this.idJugador = id; 
+    }
+    
+    public int getIdUsuario() { 
+        return idUsuario; 
+    }
+    
+    public void setIdUsuario(int id) { 
+        this.idUsuario = id; 
+    }
+    
+    public String getNombreJugador() { 
+        return nombreJugador; 
+    }
+    
+    public void setNombreJugador(String nombre) { 
+        this.nombreJugador = nombre; 
+    }
+    
+    public String getIdSalaActual() { 
+        return idSalaActual; 
+    }
+    
+    public void setIdSalaActual(String idSala) { 
+        this.idSalaActual = idSala; 
+    }
+    
+    public boolean estaConectado() { 
+        return conectado; 
+    }
+    
+    public boolean esEspectador() { 
+        return esEspectador; 
+    }
+    
+    public void setEspectador(boolean espectador) { 
+        this.esEspectador = espectador; 
+    }
+}
