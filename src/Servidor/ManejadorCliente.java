@@ -83,12 +83,12 @@ public class ManejadorCliente implements Runnable {
                 break;
                 
             case UNIRSE_SALA:
-                servidor.unirseASala(idCliente, msg.getIdSala(), msg.getNombreJugador(), msg.isEsEspectador());
+                servidor.unirseSala(idCliente, msg.getIdSala(), msg.getNombreJugador(), msg.isEsEspectador());
                 break;
                 
             case SALIR_SALA:
                 if (idSalaActual != null) {
-                    servidor.salirDeSala(idCliente, idSalaActual);
+                    servidor.salirSala(idCliente, idSalaActual);
                     servidor.enviarListaSalas(idCliente);
                 }
                 break;
@@ -101,13 +101,13 @@ public class ManejadorCliente implements Runnable {
                 
             case PEDIR:
                 if (idSalaActual != null && !esEspectador) {
-                    servidor.jugadorPedir(idCliente, idSalaActual);
+                    servidor.jugadorPide(idCliente, idSalaActual);
                 }
                 break;
                 
             case PLANTARSE:
                 if (idSalaActual != null && !esEspectador) {
-                    servidor.jugadorPlantarse(idCliente, idSalaActual);
+                    servidor.jugadorSePlanta(idCliente, idSalaActual);
                 }
                 break;
                 
