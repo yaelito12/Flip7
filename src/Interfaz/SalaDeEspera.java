@@ -201,26 +201,23 @@ public void updateRoom(SalaJuego room) {
             totalPlayers = room.getJugadoresActuales();
             maxPlayers = room.getMaxJugadores();
 
-            // Mostrar botón "UNIRSE" si es espectador y hay espacio
             joinAsPlayerBtn.setVisible(
                 isSpectator && !room.isJuegoIniciado() &&
                 room.getJugadoresActuales() < room.getMaxJugadores()
             );
 
-            // --- LISTA DE JUGADORES ---
             playerListPanel.removeAll();
 
-            java.util.List<String> jugadores = room.getJugadores();
+            java.util.List<String> jugadores = room.getNombresJugadores();
             for (int i = 0; i < jugadores.size(); i++) {
                 String nombre = jugadores.get(i);
                 boolean isHost = (i == 0);
                 boolean ready = readyPlayers.contains(nombre);
-                playerListPanel.add(createPlayerEntry(nombre, isHost, ready, false));
+               playerListPanel.add(createPlayerEntry(nombre, isHost, ready, false));
                 playerListPanel.add(Box.createVerticalStrut(8));
             }
 
-            // --- LISTA DE ESPECTADORES ---
-            java.util.List<String> espectadores = room.getEspectadores();
+            java.util.List<String> espectadores = room.getNombresEspectadores();
             if (!espectadores.isEmpty()) {
                 playerListPanel.add(Box.createVerticalStrut(10));
                 JLabel specTitle = new JLabel("--- Observadores ---");
