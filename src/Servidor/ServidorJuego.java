@@ -310,5 +310,40 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
     private void enviarAJugador(int idJugador, MensajeJuego msg) { for (Map.Entry<Integer, Integer> entrada : clienteAIdJugador.entrySet()) if (entrada.getValue() == idJugador) { ManejadorCliente manejador = jugadores.get(entrada.getKey()); if (manejador != null) manejador.enviarMensaje(msg); break; } }
     private void difundirEstadoJuego() { difundir(MensajeJuego.estadoJuego(logicaJuego.getEstadoJuego())); }
     
-   
+    public void alRepartirCarta(int id, Carta c) { difundir(MensajeJuego.cartaRepartida(id, c)); difundirEstadoJuego(); }
+    public void alEliminarJugador(int id, Carta c) { difundir(MensajeJuego.jugadorEliminado(id, c)); difundirEstadoJuego(); }
+    public void alPlantarseJugador(int id) { MensajeJuego m = new MensajeJuego(MensajeJuego.TipoMensaje.JUGADOR_PLANTADO); m.setIdJugador(id); difundir(m); difundirEstadoJuego(); }
+    public void alCongelarJugador(int id) { MensajeJuego m = new MensajeJuego(MensajeJuego.TipoMensaje.JUGADOR_CONGELADO); m.setIdJugador(id); difundir(m); difundirEstadoJuego(); }
+    public void alRobarCartaAccion(int id, Carta c) { MensajeJuego m = new MensajeJuego(MensajeJuego.TipoMensaje.CARTA_ACCION_ROBADA); m.setIdJugador(id); m.setCarta(c); difundir(m); }
+    public void alCambiarTurno(int id) { difundir(MensajeJuego.tuTurno(id)); difundirEstadoJuego(); }
+    public void alActualizarEstado(EstadoJuego e) { difundirEstadoJuego(); }
+    public void alNecesitarObjetivoAccion(int id, Carta c, java.util.List<Jugador> a) { enviarAJugador(id, MensajeJuego.elegirObjetivoAccion(c, a)); }
+    
+    public void alFinRonda(java.util.List<Jugador> jugadores, int ronda) {
+        difundir(MensajeJuego.finRonda(jugadores, ronda));
+        new Timer().schedule(new TimerTask() { public void run() { synchronized (InstanciaSalaJuego.this) { if (sala.isJuegoIniciado() && logicaJuego.getEstadoJuego().getFase() == EstadoJuego.Fase.FIN_RONDA) logicaJuego.iniciarSiguienteRonda(); } } }, 5000);
+    }
+    
+    public void alFinJuego(Jugador ganador) {
+        difundir(MensajeJuego.finJuego(logicaJuego.getEstadoJuego().getJugadores(), ganador.getId()));
+        ManejadorBaseDatos bd = servidor.getBaseDatos();
+        for (Map.Entry<Integer, ManejadorCliente> entrada : jugadores.entrySet()) {
+            ManejadorCliente manejador = entrada.getValue();
+            int idUsuario = manejador.getIdUsuario();
+            if (idUsuario > 0) {
+                Integer idJugador = clienteAIdJugador.get(manejador.getIdCliente());
+                if (idJugador != null) {
+                    Jugador jugador = encontrarJugadorPorId(idJugador);
+                    if (jugador != null) {
+                        boolean gano = (jugador.getId() == ganador.getId());
+                        int puntaje = jugador.getPuntajeTotal();
+                        boolean actualizado = bd.actualizarEstadisticas(idUsuario, gano, puntaje);
+                        if (actualizado) System.out.println("[BD] Stats actualizadas: " + manejador.getNombreJugador() + " (Gano: " + gano + ", Puntaje: " + puntaje + ")");
+                        else System.err.println("[BD] Error actualizando stats de: " + manejador.getNombreJugador());
+                    }
+                }
+            }
+        }
+        terminarJuego();
+    }
 }
