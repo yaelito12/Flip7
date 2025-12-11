@@ -873,3 +873,76 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
     public void alListaSalas(List<SalaJuego> salas) {
         panelLobby.updateRoomList(salas);
     }
+    
+    @Override
+    public void alCrearSala(SalaJuego sala, int idJugador) {
+        SwingUtilities.invokeLater(() -> {
+            miIdJugador = idJugador;
+            esHost = true;
+            esEspectador = false;
+            salaDeEspera.setSpectator(false);
+            salaDeEspera.updateRoom(sala);
+            mostrarPanel("waiting");
+        });
+    }
+
+    @Override
+    public void alUnirseSala(SalaJuego sala, int idJugador) {
+        SwingUtilities.invokeLater(() -> {
+            miIdJugador = idJugador;
+            esEspectador = (idJugador < 0);
+            esHost = false;
+            salaDeEspera.setSpectator(esEspectador);
+            salaDeEspera.updateRoom(sala);
+            mostrarPanel("waiting");
+        });
+    }
+
+    @Override
+    public void alActualizarSala(SalaJuego sala) {
+        salaDeEspera.updateRoom(sala);
+    }
+
+    @Override
+    public void alErrorSala(String error) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
+        });
+    }
+
+    @Override
+    public void alRecibirRankings(List<Usuario> rankings) {
+        panelRankings.actualizarRankings(rankings);
+    }
+
+    private void limpiarEstadoJuego() {
+        SwingUtilities.invokeLater(() -> {
+            panelJugadores.removeAll();
+            panelesJugadores.clear();
+
+            for (int i = 0; i < 6; i++) {
+                JPanel vacio = new JPanel();
+                vacio.setOpaque(false);
+                panelJugadores.add(vacio);
+            }
+
+            panelJugadores.revalidate();
+            panelJugadores.repaint();
+            areaChat.setText("");
+            indicadorTurno.setText("");
+        });
+    }
+
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) { }
+
+        SwingUtilities.invokeLater(() -> {
+            VentanaJuego v = new VentanaJuego();
+            v.setVisible(true);
+        });
+    }
+}
+
