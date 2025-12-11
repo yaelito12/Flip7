@@ -58,3 +58,54 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
             }
         });
     }
+    private void inicializarUI() {
+
+        cardLayout = new CardLayout();
+
+        contenedorPrincipal = new JPanel(cardLayout) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                GradientPaint bg = new GradientPaint(
+                        0, 0, AZUL_CLARO,
+                        0, getHeight(), new Color(248, 250, 252));
+                g2.setPaint(bg);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
+                g2.setColor(Color.WHITE);
+                g2.fillOval(-50, -80, 300, 200);
+                g2.fillOval(150, -50, 250, 180);
+                g2.fillOval(getWidth() - 250, -60, 350, 220);
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            }
+        };
+
+        panelLogin = new PanelInicioSesion(new PanelInicioSesion.EscuchaInicioSesion() {
+
+            @Override
+            public void alIniciarSesion(String usuario, String contrasena, String host, int puerto) {
+                new Thread(() -> {
+                    if (!cliente.estaConectado()) {
+                        if (!cliente.conectar(host, puerto, usuario)) {
+                            panelLogin.alFallarConexion();
+                            return;
+                        }
+                    }
+                    cliente.login(usuario, contrasena);
+                }).start();
+            }
+
+            @Override
+            public void alRegistrar(String usuario, String contrasena, String host, int puerto) {
+                new Thread(() -> {
+                    if (!cliente.estaConectado()) {
+                        if (!cliente.conectar(host, puerto, usuario)) {
+                            panelLogin.alFallarConexion();
+                            return;
+                        }
+                    }
+                    cliente.registrar(usuario, contrasena);
+                }).start();
+            }
+        });
