@@ -37,3 +37,34 @@ public class PanelRankings extends JPanel {
         add(crearPanelTablaRankings(), BorderLayout.CENTER);
         add(crearPanelBotones(), BorderLayout.SOUTH);
     }
+    
+    private JPanel crearEncabezado() {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+
+        JLabel titulo = new JLabel("TABLA DE RANKINGS") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g2.setFont(getFont());
+                g2.setColor(AZUL_OSCURO);
+                g2.drawString(getText(), 0, getHeight() - 5);
+            }
+        };
+        titulo.setFont(new Font("Arial", Font.BOLD, 32));
+
+        JLabel subtitulo = new JLabel("Los mejores jugadores de Flip 7");
+        subtitulo.setFont(new Font("Arial", Font.ITALIC, 14));
+        subtitulo.setForeground(new Color(100, 116, 139));
+
+        JPanel panelTitulo = new JPanel(new BorderLayout(0, 5));
+        panelTitulo.setOpaque(false);
+        panelTitulo.add(titulo, BorderLayout.NORTH);
+        panelTitulo.add(subtitulo, BorderLayout.CENTER);
+
+        header.add(panelTitulo, BorderLayout.WEST);
+
+        return header;
+    }
+
