@@ -1,3 +1,6 @@
+<<<<<<< OURS
+/nbproject/private/
+=======
 # Archivos compilados de Java
 *.class
 *.jar
@@ -95,3 +98,4 @@ dependencies/
 *.jks
 
 # Archivos de configuracion sensible
+>>>>>>> THEIRS
