@@ -388,3 +388,135 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
 
         return derecho;
     }
+      private JPanel crearControles() {
+        JPanel controles = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15)) {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Color.WHITE);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setColor(new Color(100, 180, 246));
+                g2.fillRect(0, 0, getWidth(), 4);
+            }
+        };
+
+        controles.setBorder(new EmptyBorder(12, 0, 18, 0));
+
+        botonListo = crearBoton("LISTO", VERDE);
+        botonPedir = crearBoton("PEDIR CARTA", AZUL_OSCURO);
+        botonPlantarse = crearBoton("PLANTARSE", NARANJA);
+        JButton botonSalir = crearBoton("SALIR", ROJO);
+
+        botonListo.addActionListener(e -> {
+            cliente.listo();
+            botonListo.setEnabled(false);
+            botonListo.setText("ESPERANDO...");
+        });
+
+        botonPedir.addActionListener(e -> {
+            if (esMiTurno) cliente.pedir();
+        });
+
+        botonPlantarse.addActionListener(e -> {
+            if (esMiTurno) cliente.plantarse();
+        });
+
+        botonSalir.addActionListener(e -> {
+            if (esHost && juegoIniciado) {
+                int c = JOptionPane.showConfirmDialog(
+                        this,
+                        "Eres el HOST. Si sales, la partida terminará para todos.\n¿Salir?",
+                        "Advertencia",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+                if (c == JOptionPane.YES_OPTION) {
+                    cliente.salirSala();
+                    juegoIniciado = false;
+                    esHost = false;
+                    limpiarEstadoJuego();
+                    mostrarPanel("lobby");
+                }
+            } else {
+                cliente.salirSala();
+                juegoIniciado = false;
+                limpiarEstadoJuego();
+                mostrarPanel("lobby");
+            }
+        });
+
+        botonListo.setEnabled(false);
+        botonPedir.setEnabled(false);
+        botonPlantarse.setEnabled(false);
+
+        controles.add(botonSalir);
+        controles.add(botonListo);
+        controles.add(botonPedir);
+        controles.add(botonPlantarse);
+
+        return controles;
+    }
+
+    private JButton crearBoton(String texto, Color color) {
+        JButton btn = new JButton(texto) {
+            boolean hover = false;
+
+            {
+                addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) { hover = true; repaint(); }
+                    @Override
+                    public void mouseExited(MouseEvent e) { hover = false; repaint(); }
+                });
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int w = getWidth(), h = getHeight();
+
+                Color c = isEnabled()
+                        ? (hover ? aclarar(color, 1.1f) : color)
+                        : new Color(203, 213, 225);
+
+                g2.setColor(new Color(0, 0, 0, 25));
+                g2.fill(new RoundRectangle2D.Float(3, 3, w - 3, h - 3, 14, 14));
+
+                g2.setColor(c);
+                g2.fill(new RoundRectangle2D.Float(0, 0, w - 3, h - 3, 14, 14));
+
+                g2.setPaint(new GradientPaint(
+                        0, 0, new Color(255, 255, 255, 80),
+                        0, h / 2, new Color(255, 255, 255, 0)));
+                g2.fill(new RoundRectangle2D.Float(2, 2, w - 7, h / 2 - 2, 12, 12));
+
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+
+                g2.setColor(isEnabled() ? Color.WHITE : new Color(148, 163, 184));
+                g2.drawString(getText(),
+                        (w - fm.stringWidth(getText())) / 2,
+                        (h + fm.getAscent() - fm.getDescent()) / 2);
+            }
+
+            private Color aclarar(Color col, float factor) {
+                return new Color(
+                        Math.min(255, (int) (col.getRed() * factor)),
+                        Math.min(255, (int) (col.getGreen() * factor)),
+                        Math.min(255, (int) (col.getBlue() * factor))
+                );
+            }
+        };
+
+        btn.setFont(new Font("Arial", Font.BOLD, 14));
+        btn.setPreferredSize(new Dimension(160, 50));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
