@@ -1,6 +1,4 @@
-
 package Servidor;
-
 
 import gflip7.comun.Jugador;
 import gflip7.comun.MensajeJuego;
@@ -599,4 +597,4 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
         }
         terminarJuego();
     }
-
+}
