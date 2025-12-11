@@ -212,3 +212,77 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
     private void mostrarPanel(String nombre) {
         cardLayout.show(contenedorPrincipal, nombre);
     }
+     private JPanel crearPanelJuego() {
+        JPanel principal = new JPanel(new BorderLayout(0, 0));
+        principal.setOpaque(false);
+
+        JPanel cabecera = crearCabeceraJuego();
+
+        JPanel areaCentral = new JPanel(new BorderLayout(15, 0));
+        areaCentral.setOpaque(false);
+        areaCentral.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        JPanel panelMesa = crearPanelMesa();
+        JPanel panelDerecho = crearPanelDerecho();
+
+        areaCentral.add(panelMesa, BorderLayout.CENTER);
+        areaCentral.add(panelDerecho, BorderLayout.EAST);
+
+        JPanel controles = crearControles();
+
+        principal.add(cabecera, BorderLayout.NORTH);
+        principal.add(areaCentral, BorderLayout.CENTER);
+        principal.add(controles, BorderLayout.SOUTH);
+
+        return principal;
+    }
+
+    private JPanel crearPanelMesa() {
+        JPanel mesa = new JPanel(new BorderLayout()) {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g;
+
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int w = getWidth(), h = getHeight();
+
+                g2.setColor(new Color(100, 150, 200, 30));
+                g2.fill(new RoundRectangle2D.Float(4, 4, w - 4, h - 4, 28, 28));
+
+                g2.setColor(Color.WHITE);
+                g2.fill(new RoundRectangle2D.Float(0, 0, w - 5, h - 5, 28, 28));
+
+                g2.setStroke(new BasicStroke(4f));
+                g2.setColor(new Color(100, 180, 246));
+                g2.draw(new RoundRectangle2D.Float(2, 2, w - 9, h - 9, 26, 26));
+
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.12f));
+                g2.setColor(new Color(100, 180, 246));
+                g2.fillOval(w / 2 - 80, h / 2 - 80, 160, 160);
+
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
+                g2.setFont(new Font("Arial", Font.BOLD, 42));
+                FontMetrics fm = g2.getFontMetrics();
+                g2.setColor(AZUL_OSCURO);
+                g2.drawString("FLIP", w / 2 - fm.stringWidth("FLIP") / 2, h / 2 - 8);
+
+                g2.setFont(new Font("Arial", Font.BOLD, 56));
+                fm = g2.getFontMetrics();
+                g2.drawString("7", w / 2 - fm.stringWidth("7") / 2, h / 2 + 45);
+
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            }
+        };
+
+        mesa.setOpaque(false);
+        mesa.setBorder(new EmptyBorder(25, 25, 25, 25));
+
+        panelJugadores = new JPanel(new GridLayout(2, 3, 15, 15));
+        panelJugadores.setOpaque(false);
+
+        mesa.add(panelJugadores, BorderLayout.CENTER);
+        return mesa;
+    }
