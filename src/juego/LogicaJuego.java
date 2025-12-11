@@ -7,10 +7,6 @@ import gflip7.comun.Mazo;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author gerth
- */
 public class LogicaJuego {
     
      private EstadoJuego estadoJuego = new EstadoJuego();

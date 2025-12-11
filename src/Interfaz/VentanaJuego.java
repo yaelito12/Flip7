@@ -1,6 +1,5 @@
 package Interfaz;
-
-import gflip7.cliente.ClienteJuego;
+import cliente.JuegoCliente;
 import gflip7.comun.*;
 
 import javax.swing.*;
@@ -13,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJuego {
+public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJuego {
 
-    private ClienteJuego cliente = new ClienteJuego();
+    private JuegoCliente cliente = new JuegoCliente ();
     private int miIdJugador = -1;
     private boolean esMiTurno, juegoIniciado, esEspectador;
 
@@ -50,7 +49,6 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
         setSize(1250, 850);
         setMinimumSize(new Dimension(1000, 700));
         setLocationRelativeTo(null);
-
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -58,10 +56,10 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
             }
         });
     }
+    
     private void inicializarUI() {
 
         cardLayout = new CardLayout();
-
         contenedorPrincipal = new JPanel(cardLayout) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -576,7 +574,6 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
     }
 @Override
     public void alConectar(int idJugador, String nombreJugador) {
-        // No hace nada aquí.
     }
 
     @Override
