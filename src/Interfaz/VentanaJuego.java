@@ -520,3 +520,58 @@ public class VentanaJuego extends JFrame implements ClienteJuego.EscuchaClienteJ
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
+    
+    private void actualizarControles() {
+        SwingUtilities.invokeLater(() -> {
+            botonPedir.setEnabled(juegoIniciado && esMiTurno && !esEspectador);
+            botonPlantarse.setEnabled(juegoIniciado && esMiTurno && !esEspectador);
+        });
+    }
+
+    private void actualizarPanelesJugadores(EstadoJuego estado) {
+
+        if (estado == null) return;
+
+        SwingUtilities.invokeLater(() -> {
+
+            List<Jugador> jugadores = estado.getJugadores();
+
+            List<Jugador> conectados = new java.util.ArrayList<>();
+            for (Jugador j : jugadores)
+                if (j.estaConectado()) conectados.add(j);
+
+            if (panelesJugadores.size() != conectados.size()) {
+                panelJugadores.removeAll();
+                panelesJugadores.clear();
+
+                for (Jugador j : conectados) {
+                    PanelJugador pj = new PanelJugador(j.getId() == miIdJugador);
+                    pj.setJugador(j);
+                    panelesJugadores.put(j.getId(), pj);
+                    panelJugadores.add(pj);
+                }
+
+                for (int i = conectados.size(); i < 6; i++) {
+                    JPanel vacio = new JPanel();
+                    vacio.setOpaque(false);
+                    panelJugadores.add(vacio);
+                }
+
+                panelJugadores.revalidate();
+            }
+
+            Jugador turno = estado.getJugadorActual();
+
+            for (Jugador j : conectados) {
+                PanelJugador pj = panelesJugadores.get(j.getId());
+                if (pj != null) {
+                    pj.setJugador(j);
+                    pj.setTurnoActual(turno != null && turno.getId() == j.getId());
+                }
+            }
+
+            panelInfo.actualizarEstado(estado);
+            panelJugadores.repaint();
+        });
+    }
+
