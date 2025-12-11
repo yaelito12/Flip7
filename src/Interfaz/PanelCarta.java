@@ -1,4 +1,4 @@
-package cliente;
+package Interfaz;
 
 import gflip7.comun.Carta;
 import javax.swing.*;
