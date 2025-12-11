@@ -68,3 +68,74 @@ public class PanelRankings extends JPanel {
         return header;
     }
 
+    private JPanel crearPanelTablaRankings() {
+        JPanel panel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                g2.setColor(new Color(100, 150, 200, 30));
+                g2.fill(new RoundRectangle2D.Float(3, 3, getWidth(), getHeight(), 16, 16));
+
+                g2.setColor(Color.WHITE);
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth() - 3, getHeight() - 3, 16, 16));
+
+                g2.setStroke(new BasicStroke(2f));
+                g2.setColor(new Color(100, 180, 246));
+                g2.draw(new RoundRectangle2D.Float(1, 1, getWidth() - 5, getHeight() - 5, 15, 15));
+            }
+        };
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+
+        String[] columnas = {"Pos", "Jugador", "Partidas", "Ganadas", "% Victoria", "Puntos"};
+        modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int col) { return false; }
+        };
+
+        tablaRankings = new JTable(modeloTabla);
+        tablaRankings.setFont(new Font("Arial", Font.PLAIN, 14));
+        tablaRankings.setRowHeight(45);
+        tablaRankings.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tablaRankings.setShowGrid(false);
+        tablaRankings.setIntercellSpacing(new Dimension(0, 5));
+
+        JTableHeader headerTabla = tablaRankings.getTableHeader();
+        headerTabla.setFont(new Font("Arial", Font.BOLD, 14));
+        headerTabla.setBackground(AZUL_CLARO);
+        headerTabla.setForeground(new Color(30, 41, 59));
+        headerTabla.setPreferredSize(new Dimension(0, 45));
+
+        DefaultTableCellRenderer rendererCentro = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable t, Object v, boolean sel, boolean foc, int row, int col) {
+                Component c = super.getTableCellRendererComponent(t, v, sel, foc, row, col);
+                if (sel) {
+                    c.setBackground(new Color(219, 234, 254));
+                    c.setForeground(AZUL_OSCURO);
+                } else {
+                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                    c.setForeground(new Color(51, 65, 85));
+                }
+
+                setHorizontalAlignment(col == 1 ? SwingConstants.LEFT : SwingConstants.CENTER);
+                setBorder(new EmptyBorder(0, 10, 0, 10));
+
+                return c;
+            }
+        };
+
+        for (int i = 0; i < tablaRankings.getColumnCount(); i++) {
+            tablaRankings.getColumnModel().getColumn(i).setCellRenderer(rendererCentro);
+        }
+
+        JScrollPane scroll = new JScrollPane(tablaRankings);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(null);
+
+        panel.add(scroll, BorderLayout.CENTER);
+        return panel;
+    }
