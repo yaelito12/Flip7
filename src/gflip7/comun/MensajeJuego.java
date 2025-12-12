@@ -275,6 +275,15 @@ public void setIdJugador(int id) {
     this.idJugador = id; 
 }
 
+
+public void setNombreJugador(String nombre) {
+    this.nombreJugador = nombre;
+}
+
+public void setCarta(Carta carta) {
+    this.carta = carta;
+}
+
 public int getIdJugadorObjetivo() { 
     return idJugadorObjetivo; 
 }
@@ -321,6 +330,7 @@ public boolean isEsEspectador() {
 
 public List<SalaJuego> getSalas() { 
     return salas; 
+
 }
 
 public SalaJuego getSala() { 
@@ -346,4 +356,56 @@ public String getNombreUsuario() {
 public String getContrasena() { 
     return contrasena; 
 }
+
+}
+
+public SalaJuego getSala() { 
+    return sala; 
+}
+
+public Usuario getUsuario() { 
+    return usuario; 
+}
+
+public List<Usuario> getRankings() { 
+    return rankings; 
+}
+
+public List<String> getJugadoresListos() { 
+    return jugadoresListos; 
+}
+
+public String getNombreUsuario() { 
+    return nombreUsuario; 
+}
+
+public String getContrasena() { 
+    return contrasena; 
+}
+public static MensajeJuego estadoJuego(EstadoJuego estado) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.ESTADO_JUEGO);
+    m.estadoJuego = estado;
+    return m;
+}
+
+public static MensajeJuego chat(int idJugador, String nombre, String mensaje) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.CHAT_DIFUSION);
+    m.idJugador = idJugador;
+    m.nombreJugador = nombre;
+    m.mensaje = mensaje;
+    return m;
+}
+
+public static MensajeJuego jugadoresListos(List<String> listaNombres) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.JUGADORES_LISTOS);
+    m.jugadoresListos = listaNombres;
+    return m;
+}
+
+public static MensajeJuego respuestaRankings(List<Usuario> rankings) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.RESPUESTA_RANKINGS);
+    m.rankings = rankings;
+    return m;
+}
+
 }
