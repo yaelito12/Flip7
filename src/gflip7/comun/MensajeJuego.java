@@ -1,8 +1,13 @@
-package flip7.comun;
+package gflip7.comun;
 
-import gflip7.comun.SalaJuego;
+
 import java.io.Serializable;
 import java.util.List;
+import gflip7.comun.Carta;
+import gflip7.comun.Jugador;
+import gflip7.comun.EstadoJuego;
+import gflip7.comun.SalaJuego;
+import gflip7.comun.Usuario;
 
 public class MensajeJuego implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -258,4 +263,120 @@ public class MensajeJuego implements Serializable {
         m.idJugador = idGanador;
         return m;
     }
+    public TipoMensaje getTipo() { 
+    return tipo; 
+}
+
+public int getIdJugador() { 
+    return idJugador; 
+}
+
+public void setIdJugador(int id) { 
+    this.idJugador = id; 
+}
+
+public void setNombreJugador(String nombre) {
+    this.nombreJugador = nombre;
+}
+
+public void setCarta(Carta carta) {
+    this.carta = carta;
+}
+public int getIdJugadorObjetivo() { 
+    return idJugadorObjetivo; 
+}
+
+public int getNumeroRonda() { 
+    return numeroRonda; 
+}
+
+public String getNombreJugador() { 
+    return nombreJugador; 
+}
+
+public String getMensaje() { 
+    return mensaje; 
+}
+
+public Carta getCarta() { 
+    return carta; 
+}
+
+public List<Jugador> getJugadores() { 
+    return jugadores; 
+}
+
+public EstadoJuego getEstadoJuego() { 
+    return estadoJuego; 
+}
+
+public String getIdSala() { 
+    return idSala; 
+}
+
+public String getNombreSala() { 
+    return nombreSala; 
+}
+
+public int getMaxJugadores() { 
+    return maxJugadores; 
+}
+
+public boolean isEsEspectador() { 
+    return esEspectador; 
+}
+
+public List<SalaJuego> getSalas() { 
+    return salas; 
+}
+
+public SalaJuego getSala() { 
+    return sala; 
+}
+
+public Usuario getUsuario() { 
+    return usuario; 
+}
+
+public List<Usuario> getRankings() { 
+    return rankings; 
+}
+
+public List<String> getJugadoresListos() { 
+    return jugadoresListos; 
+}
+
+public String getNombreUsuario() { 
+    return nombreUsuario; 
+}
+
+public String getContrasena() { 
+    return contrasena; 
+}
+public static MensajeJuego estadoJuego(EstadoJuego estado) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.ESTADO_JUEGO);
+    m.estadoJuego = estado;
+    return m;
+}
+
+public static MensajeJuego chat(int idJugador, String nombre, String mensaje) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.CHAT_DIFUSION);
+    m.idJugador = idJugador;
+    m.nombreJugador = nombre;
+    m.mensaje = mensaje;
+    return m;
+}
+
+public static MensajeJuego jugadoresListos(List<String> listaNombres) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.JUGADORES_LISTOS);
+    m.jugadoresListos = listaNombres;
+    return m;
+}
+
+public static MensajeJuego respuestaRankings(List<Usuario> rankings) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.RESPUESTA_RANKINGS);
+    m.rankings = rankings;
+    return m;
+}
+
 }
