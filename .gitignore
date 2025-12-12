@@ -1,0 +1,98 @@
+# Archivos compilados de Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Archivos de logs
+*.log
+
+# Archivos de base de datos
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Directorios de compilación
+bin/
+build/
+target/
+out/
+dist/
+
+# Archivos de IDE - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Archivos de IDE - Eclipse
+.classpath
+.project
+.settings/
+*.launch
+
+# Archivos de IDE - NetBeans
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+nbproject/private/
+
+# Archivos de IDE - Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Archivos generados por sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Archivos de backup
+*.bak
+*.backup
+*.old
+
+# Archivos de Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+dependency-reduced-pom.xml
+
+# Archivos de Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Configuración local
+config.properties
+*.local
+
+# Resultados de pruebas
+test-output/
+*.test
+
+# Documentación generada
+javadoc/
+docs/generated/
+
+# Dependencias externas
+lib/
+libs/
+dependencies/
+
+# Certificados y claves
+*.key
+*.pem
+*.cert
+*.p12
+*.jks
+/build/ 
+*.class 
