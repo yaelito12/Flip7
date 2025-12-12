@@ -360,6 +360,11 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
     String nombreJugador = manejador.getNombreJugador();
     boolean eraHost = sala.esHost(nombreJugador);
     
+    System.out.println("[DEBUG REMOVER] Jugador: " + nombreJugador);
+    System.out.println("[DEBUG REMOVER] Era host: " + eraHost);
+    System.out.println("[DEBUG REMOVER] Jugadores restantes: " + jugadores.size());
+    System.out.println("[DEBUG REMOVER] Juego iniciado: " + sala.isJuegoIniciado());
+    
     sala.removerJugador(nombreJugador);
     logicaJuego.removerJugador(idJugador);
     
