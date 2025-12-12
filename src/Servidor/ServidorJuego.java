@@ -457,14 +457,23 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
     }
     
     private void terminarJuego() {
-        sala.setJuegoIniciado(false);
-        jugadoresListos.clear();
-        nombresJugadoresListos.clear();
-        for (Jugador j : logicaJuego.getEstadoJuego().getJugadores()) {
-            j.reiniciarParaNuevoJuego();
-        }
-        servidor.alFinJuego(sala.getIdSala());
+    sala.setJuegoIniciado(false);
+    jugadoresListos.clear();
+    nombresJugadoresListos.clear();
+    
+    // Reiniciar jugadores pero NO borrarlos
+    for (Jugador j : logicaJuego.getEstadoJuego().getJugadores()) {
+        j.reiniciarParaNuevoJuego();
     }
+    
+    // NO eliminar la sala, solo marcarla como disponible
+    servidor.alFinJuego(sala.getIdSala());
+    
+    System.out.println("[SALA] [" + sala.getIdSala() + "] lista para nuevo juego");
+    
+    // Notificar a todos que la sala está lista para jugar de nuevo
+    difundirActualizacionSala();
+}
     
     public void removerEspectador(int idCliente) {
         ManejadorCliente manejador = espectadores.remove(idCliente);

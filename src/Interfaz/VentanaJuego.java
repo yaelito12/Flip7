@@ -254,28 +254,28 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             }
 
             @Override
-public void onLeaveRoom() {
-    if (esHost) {
-        int confirm = JOptionPane.showConfirmDialog(
-                VentanaJuego.this,
-                "Eres el HOST. Si sales, el rol de host se transferira\n" +
-                "al siguiente jugador en la sala.\n\n" +
-                "Deseas salir?",
-                "Confirmar Salida",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
+            public void onLeaveRoom() {
+                if (esHost) {
+                    int confirm = JOptionPane.showConfirmDialog(
+                            VentanaJuego.this,
+                            "Eres el HOST. Si sales, el rol de host se transferira\n"
+                            + "al siguiente jugador en la sala.\n\n"
+                            + "Deseas salir?",
+                            "Confirmar Salida",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
+                    );
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            cliente.salirSala();
-            esHost = false;
-            mostrarPanel("lobby");
-        }
-    } else {
-        cliente.salirSala();
-        mostrarPanel("lobby");
-    }
-}
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        cliente.salirSala();
+                        esHost = false;
+                        mostrarPanel("lobby");
+                    }
+                } else {
+                    cliente.salirSala();
+                    mostrarPanel("lobby");
+                }
+            }
 
             @Override
             public void onJoinAsPlayer() {
