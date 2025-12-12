@@ -9,35 +9,66 @@ import java.util.List;
 public class JuegoCliente {
 
     public interface EscuchaClienteJuego {
+
         void alConectar(int idJugador, String nombreJugador);
+
         void alDesconectar();
+
         void alLoginExitoso(Usuario usuario);
+
         void alLoginFallido(String razon);
+
         void alRegistroExitoso(Usuario usuario);
+
         void alRegistroFallido(String razon);
+
         void alUnirseJugador(int idJugador, String nombreJugador);
+
         void alSalirJugador(int idJugador, String nombreJugador);
+
         void alIniciarJuego(List<Jugador> jugadores);
+
         void alIniciarRonda(int numeroRonda);
+
         void alTuTurno(int idJugador);
+
         void alRepartirCarta(int idJugador, Carta carta);
+
         void alJugadorEliminado(int idJugador, Carta carta);
+
         void alJugadorPlantado(int idJugador);
+
         void alJugadorCongelado(int idJugador);
+
         void alRobarCartaAccion(int idJugador, Carta carta);
+
         void alElegirObjetivoAccion(Carta carta, List<Jugador> jugadoresActivos);
+
         void alFinRonda(List<Jugador> jugadores, int numeroRonda);
+
         void alProximaRonda(int numeroRonda, int segundosEspera); // NUEVO
+
         void alFinJuego(List<Jugador> jugadores, int idGanador);
+
         void alActualizarEstado(EstadoJuego estado);
+
         void alMensajeChat(int idJugador, String nombreJugador, String mensaje);
+
         void alError(String mensaje);
+
         void alListaSalas(List<SalaJuego> salas);
+
         void alCrearSala(SalaJuego sala, int idJugador);
+
         void alUnirseSala(SalaJuego sala, int idJugador);
+
         void alActualizarSala(SalaJuego sala);
+
         void alErrorSala(String error);
+
         void alRecibirRankings(List<Usuario> rankings);
+
+        void alCambioHost(String nuevoHost, String anteriorHost);
     }
 
     private Socket socket;
@@ -79,145 +110,178 @@ public class JuegoCliente {
                 procesarMensaje(msg);
             }
         } catch (Exception e) {
-            for (EscuchaClienteJuego esc : escuchas)
+            for (EscuchaClienteJuego esc : escuchas) {
                 esc.alDesconectar();
+            }
         }
-        
+
     }
-    
+
     private void procesarMensaje(MensajeJuego msg) {
         switch (msg.getTipo()) {
 
             case CONECTADO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alConectar(msg.getIdJugador(), msg.getNombreJugador());
+                }
                 break;
 
             case LOGIN_EXITOSO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alLoginExitoso(msg.getUsuario());
+                }
                 break;
 
             case LOGIN_FALLIDO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alLoginFallido(msg.getMensaje());
+                }
                 break;
 
             case REGISTRO_EXITOSO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alRegistroExitoso(msg.getUsuario());
+                }
                 break;
 
             case REGISTRO_FALLIDO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alRegistroFallido(msg.getMensaje());
+                }
                 break;
 
             case LISTA_SALAS:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alListaSalas(msg.getSalas());
+                }
                 break;
 
             case SALA_CREADA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alCrearSala(msg.getSala(), msg.getIdJugador());
+                }
                 break;
 
             case SALA_UNIDA:
                 idSalaActual = msg.getSala().getIdSala();
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alUnirseSala(msg.getSala(), msg.getIdJugador());
+                }
                 break;
 
             case SALA_ACTUALIZADA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alActualizarSala(msg.getSala());
+                }
                 break;
 
             case ERROR_SALA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alErrorSala(msg.getMensaje());
+                }
                 break;
 
             case JUGADOR_UNIDO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alUnirseJugador(msg.getIdJugador(), msg.getNombreJugador());
+                }
                 break;
 
             case JUGADOR_SALIO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alSalirJugador(msg.getIdJugador(), msg.getNombreJugador());
+                }
+                break;
+
+            case CAMBIO_HOST:
+                for (EscuchaClienteJuego e : escuchas) {
+                    e.alCambioHost(msg.getNuevoHost(), msg.getNombreJugador());
+                }
                 break;
 
             case JUEGO_INICIA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alIniciarJuego(msg.getJugadores());
+                }
                 break;
 
             case TU_TURNO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alTuTurno(msg.getIdJugador());
+                }
                 break;
 
             case CARTA_REPARTIDA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alRepartirCarta(msg.getIdJugador(), msg.getCarta());
+                }
                 break;
 
             case JUGADOR_ELIMINADO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alJugadorEliminado(msg.getIdJugador(), msg.getCarta());
+                }
                 break;
 
             case JUGADOR_PLANTADO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alJugadorPlantado(msg.getIdJugador());
+                }
                 break;
 
             case JUGADOR_CONGELADO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alJugadorCongelado(msg.getIdJugador());
+                }
                 break;
 
             case CARTA_ACCION_ROBADA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alRobarCartaAccion(msg.getIdJugador(), msg.getCarta());
+                }
                 break;
 
             case ELEGIR_OBJETIVO_ACCION:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alElegirObjetivoAccion(msg.getCarta(), msg.getJugadores());
+                }
                 break;
 
             case ESTADO_JUEGO:
                 estadoActual = msg.getEstadoJuego();
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alActualizarEstado(msg.getEstadoJuego());
+                }
                 break;
 
             case FIN_RONDA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alFinRonda(msg.getJugadores(), msg.getNumeroRonda());
+                }
                 break;
 
             case PROXIMA_RONDA:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alProximaRonda(msg.getNumeroRonda(), msg.getSegundosEspera());
+                }
                 break;
 
             case FIN_JUEGO:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alFinJuego(msg.getJugadores(), msg.getIdJugador());
+                }
                 break;
 
             case CHAT_DIFUSION:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alMensajeChat(msg.getIdJugador(), msg.getNombreJugador(), msg.getMensaje());
+                }
                 break;
 
             case RESPUESTA_RANKINGS:
-                for (EscuchaClienteJuego e : escuchas)
+                for (EscuchaClienteJuego e : escuchas) {
                     e.alRecibirRankings(msg.getRankings());
+                }
                 break;
         }
     }
@@ -225,8 +289,11 @@ public class JuegoCliente {
     public void desconectar() {
         try {
             conectado = false;
-            if (socket != null) socket.close();
-        } catch (IOException e) {}
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+        }
     }
 
     public void login(String usuario, String contrasena) {
@@ -286,14 +353,15 @@ public class JuegoCliente {
             var field = MensajeJuego.class.getDeclaredField("mensaje");
             field.setAccessible(true);
             field.set(m, msg);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         enviar(m);
     }
 
     public String getIdSalaActual() {
         return idSalaActual;
     }
-    
+
     public void setNombreJugador(String nombreJugador) {
         this.nombreJugador = nombreJugador;
     }
@@ -307,7 +375,8 @@ public class JuegoCliente {
             f2.setAccessible(true);
             f1.set(m, idJugador);
             f2.set(m, carta);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         enviar(m);
     }
 
@@ -316,11 +385,14 @@ public class JuegoCliente {
     }
 
     private void enviar(MensajeJuego m) {
-        if (!conectado) return; 
+        if (!conectado) {
+            return;
+        }
         try {
             out.writeObject(m);
             out.flush();
             out.reset();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 }
