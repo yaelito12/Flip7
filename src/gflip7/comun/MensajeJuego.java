@@ -44,6 +44,7 @@ public class MensajeJuego implements Serializable {
         JUGADOR_UNIDO, 
         JUGADOR_SALIO,
         LISTO,
+        CAMBIO_HOST,
         JUGADORES_LISTOS,
 
         JUEGO_INICIA, 
@@ -93,6 +94,7 @@ public class MensajeJuego implements Serializable {
     private List<String> jugadoresListos;
     private String nombreUsuario;
     private String contrasena;
+    private String nuevoHost;
 
     public static MensajeJuego login(String nombreUsuario, String contrasena) {
         MensajeJuego m = new MensajeJuego(TipoMensaje.LOGIN);
@@ -270,6 +272,14 @@ public static MensajeJuego proximaRonda(int numeroRonda, int segundosEspera) {
         m.idJugador = idGanador;
         return m;
     }
+    
+public static MensajeJuego cambioHost(String nuevoHost, String anteriorHost) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.CAMBIO_HOST);
+    m.nuevoHost = nuevoHost;
+    m.nombreJugador = anteriorHost;
+    m.mensaje = nuevoHost + " es ahora el host de la sala";
+    return m;
+}
     public TipoMensaje getTipo() { 
     return tipo; 
 }
@@ -362,6 +372,10 @@ public String getNombreUsuario() {
 
 public String getContrasena() { 
     return contrasena; 
+}
+
+public String getNuevoHost() { 
+    return nuevoHost; 
 }
 public static MensajeJuego estadoJuego(EstadoJuego estado) {
     MensajeJuego m = new MensajeJuego(TipoMensaje.ESTADO_JUEGO);

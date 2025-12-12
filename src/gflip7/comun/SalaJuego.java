@@ -105,6 +105,31 @@ public class SalaJuego implements Serializable {
         }
     }
     
+public boolean transferirHost() {
+    if (nombresJugadores.size() < 2) {
+        return false;
+    }
+    
+    String nuevoHost = nombresJugadores.get(1);
+    
+    this.nombreHost = nuevoHost;
+    
+    System.out.println("[SALA] Host transferido a: " + nuevoHost);
+    return true;
+}
+
+public void cambiarHost(String nuevoNombreHost, int nuevoIdHost) {
+    this.nombreHost = nuevoNombreHost;
+    this.idHost = nuevoIdHost;
+}
+
+public String obtenerSiguienteHost() {
+    if (nombresJugadores.size() >= 2) {
+        return nombresJugadores.get(1);
+    }
+    return null;
+}
+    
     @Override
     public String toString() {
         return nombreSala + " (" + getJugadoresActuales() + "/" + maxJugadores + ")" +
