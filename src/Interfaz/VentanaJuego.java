@@ -1,4 +1,5 @@
 package Interfaz;
+
 import cliente.JuegoCliente;
 import gflip7.comun.*;
 
@@ -45,10 +46,10 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
         super("Flip 7 - Juego de Cartas");
         cliente.agregarEscucha(this);
         inicializarUI();
-        
+
         // CAMBIO IMPORTANTE: No cerrar automáticamente
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        
+
         // Agregar listener para manejar el cierre de ventana
         addWindowListener(new WindowAdapter() {
             @Override
@@ -56,12 +57,12 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
                 manejarCierreVentana();
             }
         });
-        
+
         setSize(1250, 850);
         setMinimumSize(new Dimension(1000, 700));
         setLocationRelativeTo(null);
     }
-    
+
     /**
      * Maneja el intento de cerrar la ventana con advertencias apropiadas
      */
@@ -69,18 +70,18 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
         // CASO 1: Hay un juego en curso
         if (juegoIniciado && cliente.estaConectado()) {
             int opcion = JOptionPane.showConfirmDialog(
-                this,
-                "⚠️ HAY UNA PARTIDA EN CURSO\n\n" +
-                "Si sales ahora:\n" +
-                "• Perderás la partida automáticamente\n" +
-                "• NO recibirás puntos por esta ronda\n" +
-                "• Se registrará como derrota en tus estadísticas\n\n" +
-                "¿Estás seguro de que quieres salir?",
-                "Advertencia - Partida en Curso",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
+                    this,
+                    "⚠️ HAY UNA PARTIDA EN CURSO\n\n"
+                    + "Si sales ahora:\n"
+                    + "• Perderás la partida automáticamente\n"
+                    + "• NO recibirás puntos por esta ronda\n"
+                    + "• Se registrará como derrota en tus estadísticas\n\n"
+                    + "¿Estás seguro de que quieres salir?",
+                    "Advertencia - Partida en Curso",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
             );
-            
+
             if (opcion == JOptionPane.YES_OPTION) {
                 // Salir de la sala y desconectar
                 if (cliente.getIdSalaActual() != null) {
@@ -93,24 +94,23 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
                 System.exit(0);
             }
             // Si dice NO, no hace nada y permanece en el juego
-            
-        } 
-        // CASO 2: Está en una sala de espera
+
+        } // CASO 2: Está en una sala de espera
         else if (cliente.getIdSalaActual() != null && cliente.estaConectado()) {
             String mensaje = "Estás en una sala de espera.\n¿Deseas salir de la sala y cerrar el juego?";
-            
+
             if (esHost) {
                 mensaje = "Eres el HOST de la sala.\nSi sales, la sala se cerrará para todos.\n\n¿Deseas salir?";
             }
-            
+
             int opcion = JOptionPane.showConfirmDialog(
-                this,
-                mensaje,
-                "Confirmar Salida",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+                    this,
+                    mensaje,
+                    "Confirmar Salida",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
             );
-            
+
             if (opcion == JOptionPane.YES_OPTION) {
                 cliente.salirSala();
                 if (cliente.estaConectado()) {
@@ -119,30 +119,28 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
                 dispose();
                 System.exit(0);
             }
-        }
-        // CASO 3: Está conectado pero no en sala ni jugando
+        } // CASO 3: Está conectado pero no en sala ni jugando
         else if (cliente.estaConectado()) {
             int opcion = JOptionPane.showConfirmDialog(
-                this,
-                "¿Deseas cerrar el juego?",
-                "Confirmar Salida",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+                    this,
+                    "¿Deseas cerrar el juego?",
+                    "Confirmar Salida",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
             );
-            
+
             if (opcion == JOptionPane.YES_OPTION) {
                 cliente.desconectar();
                 dispose();
                 System.exit(0);
             }
-        }
-        // CASO 4: No está conectado, puede cerrar directamente
+        } // CASO 4: No está conectado, puede cerrar directamente
         else {
             dispose();
             System.exit(0);
         }
     }
-    
+
     private void inicializarUI() {
 
         cardLayout = new CardLayout();
@@ -193,12 +191,14 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
                 }).start();
             }
         });
-        
+
         panelLobby = new PanelLobby(new PanelLobby.LobbyListener() {
 
             @Override
             public void onSalir() {
-                if (cliente.estaConectado()) cliente.desconectar();
+                if (cliente.estaConectado()) {
+                    cliente.desconectar();
+                }
                 esHost = false;
                 panelLogin.limpiarCampos();
                 mostrarPanel("login");
@@ -212,8 +212,11 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             @Override
             public void onUnirseSala(String idSala, String nombreJugador, boolean comoEspectador) {
                 esEspectador = comoEspectador;
-                if (comoEspectador) cliente.unirseSalaComoEspectador(idSala);
-                else cliente.unirseSala(idSala);
+                if (comoEspectador) {
+                    cliente.unirseSalaComoEspectador(idSala);
+                } else {
+                    cliente.unirseSala(idSala);
+                }
             }
 
             @Override
@@ -296,7 +299,7 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
     private void mostrarPanel(String nombre) {
         cardLayout.show(contenedorPrincipal, nombre);
     }
-    
+
     private JPanel crearPanelJuego() {
         JPanel principal = new JPanel(new BorderLayout(0, 0));
         principal.setOpaque(false);
@@ -371,7 +374,7 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
         mesa.add(panelJugadores, BorderLayout.CENTER);
         return mesa;
     }
-    
+
     private JPanel crearCabeceraJuego() {
         JPanel cabecera = new JPanel(new BorderLayout()) {
 
@@ -474,7 +477,7 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
 
         return derecho;
     }
-    
+
     private JPanel crearControles() {
         JPanel controles = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15)) {
 
@@ -502,29 +505,33 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
         });
 
         botonPedir.addActionListener(e -> {
-            if (esMiTurno) cliente.pedir();
+            if (esMiTurno) {
+                cliente.pedir();
+            }
         });
 
         botonPlantarse.addActionListener(e -> {
-            if (esMiTurno) cliente.plantarse();
+            if (esMiTurno) {
+                cliente.plantarse();
+            }
         });
 
         botonSalir.addActionListener(e -> {
-            
+
             if (juegoIniciado) {
                 int c = JOptionPane.showConfirmDialog(
                         this,
-                        "⚠️ HAY UNA PARTIDA EN CURSO\n\n" +
-                        "Si sales ahora:\n" +
-                        "• Perderás la partida automáticamente\n" +
-                        "• NO recibirás puntos por esta ronda\n" +
-                        "• Se registrará como derrota en tus estadísticas\n\n" +
-                        "¿Estás seguro de que quieres salir?",
+                        "⚠️ HAY UNA PARTIDA EN CURSO\n\n"
+                        + "Si sales ahora:\n"
+                        + "• Perderás la partida automáticamente\n"
+                        + "• NO recibirás puntos por esta ronda\n"
+                        + "• Se registrará como derrota en tus estadísticas\n\n"
+                        + "¿Estás seguro de que quieres salir?",
                         "Advertencia - Partida en Curso",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE
                 );
-                
+
                 if (c == JOptionPane.YES_OPTION) {
                     cliente.salirSala();
                     juegoIniciado = false;
@@ -540,7 +547,7 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE
                 );
-                
+
                 if (c == JOptionPane.YES_OPTION) {
                     cliente.salirSala();
                     esHost = false;
@@ -573,9 +580,16 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             {
                 addMouseListener(new MouseAdapter() {
                     @Override
-                    public void mouseEntered(MouseEvent e) { hover = true; repaint(); }
+                    public void mouseEntered(MouseEvent e) {
+                        hover = true;
+                        repaint();
+                    }
+
                     @Override
-                    public void mouseExited(MouseEvent e) { hover = false; repaint(); }
+                    public void mouseExited(MouseEvent e) {
+                        hover = false;
+                        repaint();
+                    }
                 });
             }
 
@@ -628,7 +642,7 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
-    
+
     private void actualizarControles() {
         SwingUtilities.invokeLater(() -> {
             botonPedir.setEnabled(juegoIniciado && esMiTurno && !esEspectador);
@@ -638,15 +652,20 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
 
     private void actualizarPanelesJugadores(EstadoJuego estado) {
 
-        if (estado == null) return;
+        if (estado == null) {
+            return;
+        }
 
         SwingUtilities.invokeLater(() -> {
 
             List<Jugador> jugadores = estado.getJugadores();
 
             List<Jugador> conectados = new java.util.ArrayList<>();
-            for (Jugador j : jugadores)
-                if (j.estaConectado()) conectados.add(j);
+            for (Jugador j : jugadores) {
+                if (j.estaConectado()) {
+                    conectados.add(j);
+                }
+            }
 
             if (panelesJugadores.size() != conectados.size()) {
                 panelJugadores.removeAll();
@@ -730,323 +749,370 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
                     "Registro Exitoso",
                     JOptionPane.INFORMATION_MESSAGE);
 
-                miIdJugador = usuario.getId();
-        cliente.setNombreJugador(usuario.getNombreUsuario());
-        panelLobby.setPlayerName(usuario.getNombreUsuario());
-        mostrarPanel("lobby");
-        panelInfo.registrar("Registro exitoso");
-    });
-}
+            miIdJugador = usuario.getId();
+            cliente.setNombreJugador(usuario.getNombreUsuario());
+            panelLobby.setPlayerName(usuario.getNombreUsuario());
+            mostrarPanel("lobby");
+            panelInfo.registrar("Registro exitoso");
+        });
+    }
 
-@Override
-public void alRegistroFallido(String razon) {
-    panelLogin.alFallarRegistro(razon);
-}
+    @Override
+    public void alRegistroFallido(String razon) {
+        panelLogin.alFallarRegistro(razon);
+    }
 
-@Override
-public void alUnirseJugador(int idJugador, String nombreJugador) {
-    panelInfo.registrar("+ " + nombreJugador + " se unió");
-}
+    @Override
+    public void alUnirseJugador(int idJugador, String nombreJugador) {
+        panelInfo.registrar("+ " + nombreJugador + " se unió");
+    }
 
-@Override
-public void alSalirJugador(int idJugador, String nombreJugador) {
-    SwingUtilities.invokeLater(() -> {
-        panelInfo.registrar("- " + nombreJugador + " salió");
+    @Override
+    public void alSalirJugador(int idJugador, String nombreJugador) {
+        SwingUtilities.invokeLater(() -> {
+            panelInfo.registrar("- " + nombreJugador + " salió");
 
-        PanelJugador panel = panelesJugadores.remove(idJugador);
-        if (panel != null) {
-            panelJugadores.remove(panel);
-            JPanel vacio = new JPanel();
-            vacio.setOpaque(false);
-            panelJugadores.add(vacio);
-            panelJugadores.revalidate();
-            panelJugadores.repaint();
-        }
-    });
-}
+            PanelJugador panel = panelesJugadores.remove(idJugador);
+            if (panel != null) {
+                panelJugadores.remove(panel);
+                JPanel vacio = new JPanel();
+                vacio.setOpaque(false);
+                panelJugadores.add(vacio);
+                panelJugadores.revalidate();
+                panelJugadores.repaint();
+            }
+        });
+    }
 
-@Override
-public void alIniciarJuego(List<Jugador> jugadores) {
-    SwingUtilities.invokeLater(() -> {
-        juegoIniciado = true;
-        botonListo.setEnabled(false);
-        botonListo.setText("EN JUEGO");
-        mostrarPanel("game");
-        panelInfo.registrar("\nJUEGO INICIADO\n");
-        actualizarControles();
-    });
-}
+    @Override
+    public void alIniciarJuego(List<Jugador> jugadores) {
+        SwingUtilities.invokeLater(() -> {
+            juegoIniciado = true;
+            botonListo.setEnabled(false);
+            botonListo.setText("EN JUEGO");
+            mostrarPanel("game");
+            panelInfo.registrar("\nJUEGO INICIADO\n");
+            actualizarControles();
+        });
+    }
 
-@Override
-public void alIniciarRonda(int numeroRonda) {
-    panelInfo.registrar("\nRONDA " + numeroRonda);
-}
+    @Override
+    public void alIniciarRonda(int numeroRonda) {
+        panelInfo.registrar("\nRONDA " + numeroRonda);
+    }
 
-@Override
-public void alTuTurno(int idJugador) {
-    SwingUtilities.invokeLater(() -> {
-        esMiTurno = (idJugador == miIdJugador);
-        actualizarControles();
+    @Override
+    public void alTuTurno(int idJugador) {
+        SwingUtilities.invokeLater(() -> {
+            esMiTurno = (idJugador == miIdJugador);
+            actualizarControles();
 
-        if (esMiTurno && !esEspectador) {
-            indicadorTurno.setText("TU TURNO");
-            Toolkit.getDefaultToolkit().beep();
-        } else {
-            EstadoJuego s = cliente.getEstadoJuegoActual();
-            if (s != null) {
-                Jugador j = s.getJugadorPorId(idJugador);
-                if (j != null)
-                    indicadorTurno.setText("Turno: " + j.getNombre());
+            if (esMiTurno && !esEspectador) {
+                indicadorTurno.setText("TU TURNO");
+                Toolkit.getDefaultToolkit().beep();
+            } else {
+                EstadoJuego s = cliente.getEstadoJuegoActual();
+                if (s != null) {
+                    Jugador j = s.getJugadorPorId(idJugador);
+                    if (j != null) {
+                        indicadorTurno.setText("Turno: " + j.getNombre());
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public void alRepartirCarta(int idJugador, Carta carta) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) {
+                panelInfo.registrar(j.getNombre() + " ← " + carta);
             }
         }
-    });
-}
-
-@Override
-public void alRepartirCarta(int idJugador, Carta carta) {
-    EstadoJuego s = cliente.getEstadoJuegoActual();
-    if (s != null) {
-        Jugador j = s.getJugadorPorId(idJugador);
-        if (j != null) panelInfo.registrar(j.getNombre() + " ← " + carta);
     }
-}
 
-@Override
-public void alJugadorEliminado(int idJugador, Carta carta) {
-    EstadoJuego s = cliente.getEstadoJuegoActual();
-    if (s != null) {
-        Jugador j = s.getJugadorPorId(idJugador);
-        if (j != null) panelInfo.registrar("X " + j.getNombre() + " eliminado con " + carta);
+    @Override
+    public void alJugadorEliminado(int idJugador, Carta carta) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) {
+                panelInfo.registrar("X " + j.getNombre() + " eliminado con " + carta);
+            }
+        }
+        if (idJugador == miIdJugador) {
+            esMiTurno = false;
+            actualizarControles();
+        }
     }
-    if (idJugador == miIdJugador) {
-        esMiTurno = false;
-        actualizarControles();
+
+    @Override
+    public void alJugadorPlantado(int idJugador) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) {
+                panelInfo.registrar(j.getNombre() + " se plantó");
+            }
+        }
+        if (idJugador == miIdJugador) {
+            esMiTurno = false;
+            actualizarControles();
+        }
     }
-}
 
-@Override
-public void alJugadorPlantado(int idJugador) {
-    EstadoJuego s = cliente.getEstadoJuegoActual();
-    if (s != null) {
-        Jugador j = s.getJugadorPorId(idJugador);
-        if (j != null) panelInfo.registrar(j.getNombre() + " se plantó");
+    @Override
+    public void alJugadorCongelado(int idJugador) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) {
+                panelInfo.registrar(j.getNombre() + " congelado");
+            }
+        }
     }
-    if (idJugador == miIdJugador) {
-        esMiTurno = false;
-        actualizarControles();
+
+    @Override
+    public void alRobarCartaAccion(int idJugador, Carta carta) {
+        EstadoJuego s = cliente.getEstadoJuegoActual();
+        if (s != null) {
+            Jugador j = s.getJugadorPorId(idJugador);
+            if (j != null) {
+                panelInfo.registrar("* " + j.getNombre() + " -> " + carta);
+            }
+        }
     }
-}
 
-@Override
-public void alJugadorCongelado(int idJugador) {
-    EstadoJuego s = cliente.getEstadoJuegoActual();
-    if (s != null) {
-        Jugador j = s.getJugadorPorId(idJugador);
-        if (j != null) panelInfo.registrar(j.getNombre() + " congelado");
+    @Override
+    public void alElegirObjetivoAccion(Carta carta, List<Jugador> jugadoresActivos) {
+        if (esEspectador) {
+            return;
+        }
+
+        SwingUtilities.invokeLater(() -> {
+            botonPedir.setEnabled(false);
+            botonPlantarse.setEnabled(false);
+
+            String[] opciones = new String[jugadoresActivos.size()];
+            for (int i = 0; i < jugadoresActivos.size(); i++) {
+                opciones[i] = jugadoresActivos.get(i).getNombre();
+            }
+
+            String seleccion = null;
+
+            while (seleccion == null) {
+                seleccion = (String) JOptionPane.showInputDialog(
+                        this,
+                        "¿A quién asignas " + carta + "?",
+                        "Carta de Acción",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        opciones,
+                        opciones[0]
+                );
+            }
+
+            for (Jugador j : jugadoresActivos) {
+                if (j.getNombre().equals(seleccion)) {
+                    cliente.asignarCartaAccion(j.getId(), carta);
+                    break;
+                }
+            }
+        });
     }
-}
 
-@Override
-public void alRobarCartaAccion(int idJugador, Carta carta) {
-    EstadoJuego s = cliente.getEstadoJuegoActual();
-    if (s != null) {
-        Jugador j = s.getJugadorPorId(idJugador);
-        if (j != null) panelInfo.registrar("* " + j.getNombre() + " -> " + carta);
+    @Override
+    public void alFinRonda(List<Jugador> jugadores, int numeroRonda) {
+        SwingUtilities.invokeLater(() -> {
+            esMiTurno = false;
+            indicadorTurno.setText("");
+            actualizarControles();
+
+            panelInfo.registrar("\nFIN RONDA " + numeroRonda);
+            for (Jugador j : jugadores) {
+                panelInfo.registrar("  " + j.getNombre() + ": +" + j.getPuntajeRonda()
+                        + " → " + j.getPuntajeTotal());
+            }
+            panelInfo.mostrarPuntuaciones(jugadores);
+        });
     }
-}
 
-@Override
-public void alElegirObjetivoAccion(Carta carta, List<Jugador> jugadoresActivos) {
-    if (esEspectador) return;
+    @Override
+    public void alProximaRonda(int numeroRonda, int segundosEspera) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Siguiente ronda en " + segundosEspera + " segundos",
+                "Ronda " + numeroRonda,
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
 
-    SwingUtilities.invokeLater(() -> {
-        botonPedir.setEnabled(false);
-        botonPlantarse.setEnabled(false);
+    @Override
+    public void alFinJuego(List<Jugador> jugadores, int idGanador) {
+        SwingUtilities.invokeLater(() -> {
+            juegoIniciado = false;
+            esMiTurno = false;
+            actualizarControles();
 
-        String[] opciones = new String[jugadoresActivos.size()];
-        for (int i = 0; i < jugadoresActivos.size(); i++)
-            opciones[i] = jugadoresActivos.get(i).getNombre();
+            Jugador ganador = null;
+            for (Jugador j : jugadores) {
+                if (j.getId() == idGanador) {
+                    ganador = j;
+                }
+            }
 
-        String seleccion = null;
+            String msg = ganador != null
+                    ? ganador.getNombre() + " gana con " + ganador.getPuntajeTotal() + " pts"
+                    : "Fin del juego";
 
-        while (seleccion == null) {
-            seleccion = (String) JOptionPane.showInputDialog(
+            panelInfo.registrar("\n" + msg + "\n");
+
+            int opcion = JOptionPane.showOptionDialog(
                     this,
-                    "¿A quién asignas " + carta + "?",
-                    "Carta de Acción",
+                    msg + "\n\n¿Jugar otra partida?",
+                    "Fin del Juego",
+                    JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null,
-                    opciones,
-                    opciones[0]
+                    new String[]{"Revancha", "Salir"},
+                    "Revancha"
             );
-        }
 
-        for (Jugador j : jugadoresActivos) {
-            if (j.getNombre().equals(seleccion)) {
-                cliente.asignarCartaAccion(j.getId(), carta);
-                break;
+            if (opcion == 0) {
+                salaDeEspera.reset();
+                limpiarEstadoJuego();
+                mostrarPanel("waiting");
+            } else {
+                cliente.salirSala();
+                limpiarEstadoJuego();
+                mostrarPanel("lobby");
             }
-        }
-    });
-}
+        });
+    }
 
-@Override
-public void alFinRonda(List<Jugador> jugadores, int numeroRonda) {
-    SwingUtilities.invokeLater(() -> {
-        esMiTurno = false;
-        indicadorTurno.setText("");
-        actualizarControles();
+    @Override
+    public void alActualizarEstado(EstadoJuego estado) {
+        actualizarPanelesJugadores(estado);
+    }
 
-        panelInfo.registrar("\nFIN RONDA " + numeroRonda);
-        for (Jugador j : jugadores)
-            panelInfo.registrar("  " + j.getNombre() + ": +" + j.getPuntajeRonda()
-                    + " → " + j.getPuntajeTotal());
-        panelInfo.mostrarPuntuaciones(jugadores);
-    });
-}
+    @Override
+    public void alMensajeChat(int idJugador, String nombreJugador, String mensaje) {
+        SwingUtilities.invokeLater(() -> {
+            areaChat.append(nombreJugador + ": " + mensaje + "\n");
+            areaChat.setCaretPosition(areaChat.getDocument().getLength());
+        });
+    }
 
-@Override
-public void alProximaRonda(int numeroRonda, int segundosEspera) {
-    JOptionPane.showMessageDialog(
-            this,
-            "Siguiente ronda en " + segundosEspera + " segundos",
-            "Ronda " + numeroRonda,
-            JOptionPane.INFORMATION_MESSAGE
-    );
-}
+    @Override
+    public void alError(String mensaje) {
+        SwingUtilities.invokeLater(() -> {
+            panelInfo.registrar("! " + mensaje);
+            JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        });
+    }
 
-@Override
-public void alFinJuego(List<Jugador> jugadores, int idGanador) {
-    SwingUtilities.invokeLater(() -> {
-        juegoIniciado = false;
-        esMiTurno = false;
-        actualizarControles();
+    @Override
+    public void alListaSalas(List<SalaJuego> salas) {
+        panelLobby.updateRoomList(salas);
+    }
 
-        Jugador ganador = null;
-        for (Jugador j : jugadores)
-            if (j.getId() == idGanador) ganador = j;
-
-        String msg = ganador != null
-                ? ganador.getNombre() + " gana con " + ganador.getPuntajeTotal() + " pts"
-                : "Fin del juego";
-
-        panelInfo.registrar("\n" + msg + "\n");
-
-        int opcion = JOptionPane.showOptionDialog(
-                this,
-                msg + "\n\n¿Jugar otra partida?",
-                "Fin del Juego",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                new String[]{"Revancha", "Salir"},
-                "Revancha"
-        );
-
-        if (opcion == 0) {
-            salaDeEspera.reset();
-            limpiarEstadoJuego();
+    @Override
+    public void alCrearSala(SalaJuego sala, int idJugador) {
+        SwingUtilities.invokeLater(() -> {
+            miIdJugador = idJugador;
+            esHost = true;
+            esEspectador = false;
+            salaDeEspera.setSpectator(false);
+            salaDeEspera.updateRoom(sala);
             mostrarPanel("waiting");
-        } else {
-            cliente.salirSala();
-            limpiarEstadoJuego();
-            mostrarPanel("lobby");
-        }
-    });
-}
+        });
+    }
 
-@Override
-public void alActualizarEstado(EstadoJuego estado) {
-    actualizarPanelesJugadores(estado);
-}
+    @Override
+    public void alUnirseSala(SalaJuego sala, int idJugador) {
+        SwingUtilities.invokeLater(() -> {
+            miIdJugador = idJugador;
+            esEspectador = (idJugador < 0);
+            esHost = false;
+            salaDeEspera.setSpectator(esEspectador);
+            salaDeEspera.updateRoom(sala);
+            mostrarPanel("waiting");
+        });
+    }
 
-@Override
-public void alMensajeChat(int idJugador, String nombreJugador, String mensaje) {
-    SwingUtilities.invokeLater(() -> {
-        areaChat.append(nombreJugador + ": " + mensaje + "\n");
-        areaChat.setCaretPosition(areaChat.getDocument().getLength());
-    });
-}
-
-@Override
-public void alError(String mensaje) {
-    SwingUtilities.invokeLater(() -> {
-        panelInfo.registrar("! " + mensaje);
-        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-    });
-}
-
-@Override
-public void alListaSalas(List<SalaJuego> salas) {
-    panelLobby.updateRoomList(salas);
-}
-
-@Override
-public void alCrearSala(SalaJuego sala, int idJugador) {
-    SwingUtilities.invokeLater(() -> {
-        miIdJugador = idJugador;
-        esHost = true;
-        esEspectador = false;
-        salaDeEspera.setSpectator(false);
+    @Override
+    public void alActualizarSala(SalaJuego sala) {
         salaDeEspera.updateRoom(sala);
-        mostrarPanel("waiting");
-    });
-}
+    }
 
-@Override
-public void alUnirseSala(SalaJuego sala, int idJugador) {
-    SwingUtilities.invokeLater(() -> {
-        miIdJugador = idJugador;
-        esEspectador = (idJugador < 0);
-        esHost = false;
-        salaDeEspera.setSpectator(esEspectador);
-        salaDeEspera.updateRoom(sala);
-        mostrarPanel("waiting");
-    });
-}
+    @Override
+    public void alErrorSala(String error) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
+        });
+    }
 
-@Override
-public void alActualizarSala(SalaJuego sala) {
-    salaDeEspera.updateRoom(sala);
-}
+    @Override
+    public void alRecibirRankings(List<Usuario> rankings) {
+        panelRankings.actualizarRankings(rankings);
+    }
 
-@Override
-public void alErrorSala(String error) {
-    SwingUtilities.invokeLater(() -> {
-        JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
-    });
-}
+    @Override
+    public void alCambioHost(String nuevoHost, String anteriorHost) {
+        SwingUtilities.invokeLater(() -> {
+            panelInfo.registrar("! Cambio de host: " + nuevoHost);
+            panelInfo.registrar("  (Anterior: " + anteriorHost + ")");
 
-@Override
-public void alRecibirRankings(List<Usuario> rankings) {
-    panelRankings.actualizarRankings(rankings);
-}
+            // Verificar si yo soy el nuevo host
+            String miNombre = cliente.getNombreJugador();
+            if (miNombre != null && miNombre.equals(nuevoHost)) {
+                esHost = true;
 
-private void limpiarEstadoJuego() {
-    SwingUtilities.invokeLater(() -> {
-        panelJugadores.removeAll();
-        panelesJugadores.clear();
+                // Mostrar notificacion
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ahora eres el HOST de la sala.\n\n"
+                        + "Como host, puedes:\n"
+                        + "- Iniciar la partida cuando todos esten listos\n"
+                        + "- La sala se cerrara si tu sales",
+                        "Eres el nuevo Host",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } else {
+                esHost = false;
+            }
+        });
+    }
 
-        for (int i = 0; i < 6; i++) {
-            JPanel vacio = new JPanel();
-            vacio.setOpaque(false);
-            panelJugadores.add(vacio);
+    private void limpiarEstadoJuego() {
+        SwingUtilities.invokeLater(() -> {
+            panelJugadores.removeAll();
+            panelesJugadores.clear();
+
+            for (int i = 0; i < 6; i++) {
+                JPanel vacio = new JPanel();
+                vacio.setOpaque(false);
+                panelJugadores.add(vacio);
+            }
+
+            panelJugadores.revalidate();
+            panelJugadores.repaint();
+            areaChat.setText("");
+            indicadorTurno.setText("");
+        });
+    }
+
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
         }
 
-        panelJugadores.revalidate();
-        panelJugadores.repaint();
-        areaChat.setText("");
-        indicadorTurno.setText("");
-    });
+        SwingUtilities.invokeLater(() -> {
+            VentanaJuego v = new VentanaJuego();
+            v.setVisible(true);
+        });
+    }
 }
-
-public static void main(String[] args) {
-    try {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (Exception e) { }
-
-    SwingUtilities.invokeLater(() -> {
-        VentanaJuego v = new VentanaJuego();
-        v.setVisible(true);
-    });
-}}

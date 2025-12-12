@@ -395,4 +395,8 @@ public class JuegoCliente {
         } catch (IOException ignored) {
         }
     }
+
+    public String getNombreJugador() {
+        return nombreJugador;
+    }
 }
