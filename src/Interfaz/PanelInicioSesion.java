@@ -52,7 +52,7 @@ public class PanelInicioSesion extends JPanel {
         caja.setLayout(new BoxLayout(caja, BoxLayout.Y_AXIS));
         caja.setOpaque(false);
         caja.setBorder(new EmptyBorder(40, 50, 40, 50));
-        caja.setPreferredSize(new Dimension(420, 520));
+        caja.setPreferredSize(new Dimension(420, 600));
         
         JLabel logo = new JLabel("FLIP 7");
         logo.setFont(new Font("Arial", Font.BOLD, 48));
