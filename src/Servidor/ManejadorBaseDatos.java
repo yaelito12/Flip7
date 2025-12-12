@@ -63,10 +63,9 @@ public class ManejadorBaseDatos {
             int id = claves.next() ? claves.getInt(1) : -1;
             claves.close();
             insertarStmt.close();
-            System.out.println("[BD] Registrado: " + nombreUsuario + " (ID: " + id + ")");
-            Usuario usuario = new Usuario(nombreUsuario, contrasena);
-            usuario.setId(id);
-            return usuario;
+
+            return new Usuario(id, nombreUsuario, 0, 0, 0);
+
         } catch (SQLException e) {
             return null;
         }
@@ -75,13 +74,21 @@ public class ManejadorBaseDatos {
     public synchronized Usuario login(String nombreUsuario, String contrasena) {
         if (conexion == null) return null;
         try {
-            PreparedStatement stmt = conexion.prepareStatement("SELECT id, nombre_usuario, contrasena, partidas_jugadas, partidas_ganadas, puntaje_total FROM usuarios WHERE LOWER(nombre_usuario) = LOWER(?)");
+            PreparedStatement stmt = conexion.prepareStatement(
+                "SELECT id, nombre_usuario, contrasena, partidas_jugadas, partidas_ganadas, puntaje_total " +
+                "FROM usuarios WHERE LOWER(nombre_usuario) = LOWER(?)"
+            );
             stmt.setString(1, nombreUsuario);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                String contrasenaAlmacenada = rs.getString("contrasena");
-                if (contrasenaAlmacenada.equals(contrasena)) {
-                    Usuario usuario = new Usuario(rs.getInt("id"), rs.getString("nombre_usuario"), rs.getInt("partidas_jugadas"), rs.getInt("partidas_ganadas"), rs.getInt("puntaje_total"));
+                if (rs.getString("contrasena").equals(contrasena)) {
+                    Usuario usuario = new Usuario(
+                        rs.getInt("id"),
+                        rs.getString("nombre_usuario"),
+                        rs.getInt("partidas_jugadas"),
+                        rs.getInt("partidas_ganadas"),
+                        rs.getInt("puntaje_total")
+                    );
                     rs.close();
                     stmt.close();
                     return usuario;
@@ -99,27 +106,35 @@ public class ManejadorBaseDatos {
         List<Usuario> rankings = new ArrayList<>();
         if (conexion == null) return rankings;
         try {
-            String consulta = "SELECT id, nombre_usuario, partidas_jugadas, partidas_ganadas, puntaje_total FROM usuarios ORDER BY puntaje_total DESC LIMIT ?";
+            String consulta =
+                "SELECT id, nombre_usuario, partidas_jugadas, partidas_ganadas, puntaje_total " +
+                "FROM usuarios ORDER BY puntaje_total DESC LIMIT ?";
             PreparedStatement stmt = conexion.prepareStatement(consulta);
             stmt.setInt(1, limite);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Usuario usuario = new Usuario(rs.getInt("id"), rs.getString("nombre_usuario"), rs.getInt("partidas_jugadas"), rs.getInt("partidas_ganadas"), rs.getInt("puntaje_total"));
-                rankings.add(usuario);
+                rankings.add(
+                    new Usuario(
+                        rs.getInt("id"),
+                        rs.getString("nombre_usuario"),
+                        rs.getInt("partidas_jugadas"),
+                        rs.getInt("partidas_ganadas"),
+                        rs.getInt("puntaje_total")
+                    )
+                );
             }
             rs.close();
             stmt.close();
-            System.out.println("[BD] Rankings obtenidos: " + rankings.size() + " usuarios");
-        } catch (SQLException e) {
-            System.err.println("[BD] Error obteniendo rankings: " + e.getMessage());
-        }
+        } catch (SQLException e) {}
         return rankings;
     }
 
     public synchronized boolean actualizarEstadisticas(int idUsuario, boolean gano, int puntaje) {
         if (conexion == null) return false;
         try {
-            PreparedStatement stmt = conexion.prepareStatement("UPDATE usuarios SET partidas_jugadas = partidas_jugadas + 1, partidas_ganadas = partidas_ganadas + ?, puntaje_total = puntaje_total + ? WHERE id = ?");
+            PreparedStatement stmt = conexion.prepareStatement(
+                "UPDATE usuarios SET partidas_jugadas = partidas_jugadas + 1, partidas_ganadas = partidas_ganadas + ?, puntaje_total = puntaje_total + ? WHERE id = ?"
+            );
             stmt.setInt(1, gano ? 1 : 0);
             stmt.setInt(2, puntaje);
             stmt.setInt(3, idUsuario);
@@ -132,6 +147,8 @@ public class ManejadorBaseDatos {
     }
 
     public void cerrar() {
-        try { if (conexion != null && !conexion.isClosed()) conexion.close(); } catch (SQLException e) {}
+        try {
+            if (conexion != null && !conexion.isClosed()) conexion.close();
+        } catch (SQLException e) {}
     }
-} 
+}
