@@ -94,3 +94,5 @@ dependencies/
 *.cert
 *.p12
 *.jks
+/build/ 
+*.class 
