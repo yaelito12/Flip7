@@ -1,4 +1,4 @@
-package flip7.comun;
+package gflip7.comun;
 
 import java.io.Serializable;
 import java.util.*;
@@ -21,9 +21,7 @@ public class EstadoJuego implements Serializable {
     private int tamanoMazo;
     private int puntajeGanador = 200;
     private Fase fase = Fase.ESPERANDO_JUGADORES;
-    
-    // ✅ GETTERS Y SETTERS BÁSICOS (COMMIT 1)
-
+   
     public List<Jugador> getJugadores() { 
         return jugadores; 
     }
@@ -71,8 +69,6 @@ public class EstadoJuego implements Serializable {
     public int getPuntajeGanador() { 
         return puntajeGanador; 
     }
-
-    // ✅ LÓGICA DEL ESTADO DEL JUEGO (COMMIT 2)
 
     public Jugador getJugadorActual() { 
         if (indiceJugadorActual >= 0 && indiceJugadorActual < jugadores.size()) {

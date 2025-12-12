@@ -275,6 +275,7 @@ public void setIdJugador(int id) {
     this.idJugador = id; 
 }
 
+
 public void setNombreJugador(String nombre) {
     this.nombreJugador = nombre;
 }
@@ -282,6 +283,7 @@ public void setNombreJugador(String nombre) {
 public void setCarta(Carta carta) {
     this.carta = carta;
 }
+
 public int getIdJugadorObjetivo() { 
     return idJugadorObjetivo; 
 }
@@ -328,6 +330,33 @@ public boolean isEsEspectador() {
 
 public List<SalaJuego> getSalas() { 
     return salas; 
+
+}
+
+public SalaJuego getSala() { 
+    return sala; 
+}
+
+public Usuario getUsuario() { 
+    return usuario; 
+}
+
+public List<Usuario> getRankings() { 
+    return rankings; 
+}
+
+public List<String> getJugadoresListos() { 
+    return jugadoresListos; 
+}
+
+public String getNombreUsuario() { 
+    return nombreUsuario; 
+}
+
+public String getContrasena() { 
+    return contrasena; 
+}
+
 }
 
 public SalaJuego getSala() { 

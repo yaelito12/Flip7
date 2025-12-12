@@ -1,4 +1,4 @@
-package flip7.comun;
+package gflip7.comun;
 
 import java.io.Serializable;
 
