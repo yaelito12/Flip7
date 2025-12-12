@@ -351,45 +351,79 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
     }
     
     public void removerJugador(int idCliente) {
-        ManejadorCliente manejador = jugadores.remove(idCliente);
-        Integer idJugador = clienteAIdJugador.remove(idCliente);
-        jugadoresListos.remove(idCliente);
-        if (manejador != null) nombresJugadoresListos.remove(manejador.getNombreJugador());
-        if (manejador == null || idJugador == null) return;
-        String nombreJugador = manejador.getNombreJugador();
-        sala.removerJugador(nombreJugador);
-        logicaJuego.removerJugador(idJugador);
-        MensajeJuego msg = new MensajeJuego(MensajeJuego.TipoMensaje.JUGADOR_SALIO);
-        msg.setIdJugador(idJugador);
-        msg.setNombreJugador(nombreJugador);
-        difundir(msg);
-        if (sala.isJuegoIniciado() && jugadores.size() == 1) {
-            ManejadorCliente ganadorManejador = jugadores.values().iterator().next();
-            Integer ganadorIdJugador = null;
-            for (Map.Entry<Integer, Integer> entrada : clienteAIdJugador.entrySet()) {
-                if (jugadores.containsKey(entrada.getKey())) {
-                    ganadorIdJugador = entrada.getValue();
+    ManejadorCliente manejador = jugadores.remove(idCliente);
+    Integer idJugador = clienteAIdJugador.remove(idCliente);
+    jugadoresListos.remove(idCliente);
+    if (manejador != null) nombresJugadoresListos.remove(manejador.getNombreJugador());
+    if (manejador == null || idJugador == null) return;
+    
+    String nombreJugador = manejador.getNombreJugador();
+    boolean eraHost = sala.esHost(nombreJugador);
+    
+    sala.removerJugador(nombreJugador);
+    logicaJuego.removerJugador(idJugador);
+    
+    if (eraHost && !sala.estaVacia() && jugadores.size() > 0) {
+        String nuevoHost = sala.obtenerSiguienteHost();
+        
+        if (nuevoHost != null) {
+            int nuevoIdHost = -1;
+            for (Map.Entry<Integer, ManejadorCliente> entrada : jugadores.entrySet()) {
+                if (entrada.getValue().getNombreJugador().equals(nuevoHost)) {
+                    nuevoIdHost = entrada.getKey();
                     break;
                 }
             }
-            if (ganadorIdJugador != null) {
-                Jugador ganadorJugador = encontrarJugadorPorId(ganadorIdJugador);
-                Jugador salioJugador = encontrarJugadorPorId(idJugador);
-                if (ganadorJugador != null) {
-                    System.out.println("[JUEGO] " + ganadorJugador.getNombre() + " gana por abandono!");
-                    difundir(MensajeJuego.finJuego(
-                        logicaJuego.getEstadoJuego().getJugadores(), ganadorIdJugador));
-                    actualizarEstadisticasJugador(ganadorManejador, true, ganadorJugador);
-                    actualizarEstadisticasJugador(manejador, false, salioJugador);
-                    terminarJuego();
-                }
-            }
-        } else if (sala.isJuegoIniciado() && jugadores.isEmpty()) {
-            System.out.println("[JUEGO] Sala [" + sala.getIdSala() + "] sin jugadores, finalizando juego");
-            terminarJuego();
+            
+            sala.cambiarHost(nuevoHost, nuevoIdHost);
+            
+            System.out.println("[HOST] Transferido de " + nombreJugador + " a " + nuevoHost);
+            
+            MensajeJuego msgCambioHost = MensajeJuego.cambioHost(nuevoHost, nombreJugador);
+            difundir(msgCambioHost);
+            
+            MensajeJuego msg = new MensajeJuego(MensajeJuego.TipoMensaje.JUGADOR_SALIO);
+            msg.setIdJugador(idJugador);
+            msg.setNombreJugador(nombreJugador);
+            difundir(msg);
+            
+            difundirActualizacionSala();
+            enviarListaJugadoresListos();
+            return;
         }
-        enviarListaJugadoresListos();
     }
+    
+    MensajeJuego msg = new MensajeJuego(MensajeJuego.TipoMensaje.JUGADOR_SALIO);
+    msg.setIdJugador(idJugador);
+    msg.setNombreJugador(nombreJugador);
+    difundir(msg);
+    
+    if (sala.isJuegoIniciado() && jugadores.size() == 1) {
+        ManejadorCliente ganadorManejador = jugadores.values().iterator().next();
+        Integer ganadorIdJugador = null;
+        for (Map.Entry<Integer, Integer> entrada : clienteAIdJugador.entrySet()) {
+            if (jugadores.containsKey(entrada.getKey())) {
+                ganadorIdJugador = entrada.getValue();
+                break;
+            }
+        }
+        if (ganadorIdJugador != null) {
+            Jugador ganadorJugador = encontrarJugadorPorId(ganadorIdJugador);
+            if (ganadorJugador != null) {
+                System.out.println("[JUEGO] " + ganadorJugador.getNombre() + " gana por abandono");
+                difundir(MensajeJuego.finJuego(
+                    logicaJuego.getEstadoJuego().getJugadores(), ganadorIdJugador));
+                actualizarEstadisticasJugador(ganadorManejador, true, ganadorJugador);
+                terminarJuego();
+            }
+        }
+    } else if (sala.isJuegoIniciado() && jugadores.isEmpty()) {
+        System.out.println("[JUEGO] Sala vacia, finalizando");
+        terminarJuego();
+    }
+    
+    enviarListaJugadoresListos();
+}
     
     private Jugador encontrarJugadorPorId(int idJugador) {
         for (Jugador j : logicaJuego.getEstadoJuego().getJugadores()) {
