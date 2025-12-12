@@ -27,6 +27,7 @@ public class JuegoCliente {
         void alRobarCartaAccion(int idJugador, Carta carta);
         void alElegirObjetivoAccion(Carta carta, List<Jugador> jugadoresActivos);
         void alFinRonda(List<Jugador> jugadores, int numeroRonda);
+        void alProximaRonda(int numeroRonda, int segundosEspera); // NUEVO
         void alFinJuego(List<Jugador> jugadores, int idGanador);
         void alActualizarEstado(EstadoJuego estado);
         void alMensajeChat(int idJugador, String nombreJugador, String mensaje);
@@ -199,6 +200,11 @@ public class JuegoCliente {
                     e.alFinRonda(msg.getJugadores(), msg.getNumeroRonda());
                 break;
 
+            case PROXIMA_RONDA:
+                for (EscuchaClienteJuego e : escuchas)
+                    e.alProximaRonda(msg.getNumeroRonda(), msg.getSegundosEspera());
+                break;
+
             case FIN_JUEGO:
                 for (EscuchaClienteJuego e : escuchas)
                     e.alFinJuego(msg.getJugadores(), msg.getIdJugador());
@@ -287,10 +293,10 @@ public class JuegoCliente {
     public String getIdSalaActual() {
         return idSalaActual;
     }
+    
     public void setNombreJugador(String nombreJugador) {
-    this.nombreJugador = nombreJugador;
-}
-
+        this.nombreJugador = nombreJugador;
+    }
 
     public void asignarCartaAccion(int idJugador, Carta carta) {
         MensajeJuego m = new MensajeJuego(MensajeJuego.TipoMensaje.ASIGNAR_CARTA_ACCION);
@@ -318,5 +324,3 @@ public class JuegoCliente {
         } catch (IOException ignored) {}
     }
 }
-
-    

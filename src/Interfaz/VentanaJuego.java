@@ -803,7 +803,28 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             panelInfo.mostrarPuntuaciones(jugadores);
         });
     }
-
+@Override
+public void alProximaRonda(int numeroRonda, int segundosEspera) {
+    SwingUtilities.invokeLater(() -> {
+        JOptionPane optionPane = new JOptionPane(
+            "Siguiente ronda en " + segundosEspera + " segundos",
+            JOptionPane.INFORMATION_MESSAGE,
+            JOptionPane.DEFAULT_OPTION,
+            null,
+            new Object[]{},
+            null
+        );
+        
+        JDialog dialog = optionPane.createDialog(this, "Ronda " + numeroRonda);
+        dialog.setModal(false);
+        dialog.setVisible(true);
+        
+        
+        Timer timer = new Timer(2000, e -> dialog.dispose());
+        timer.setRepeats(false);
+        timer.start();
+    });
+}
     @Override
     public void alFinJuego(List<Jugador> jugadores, int idGanador) {
         SwingUtilities.invokeLater(() -> {

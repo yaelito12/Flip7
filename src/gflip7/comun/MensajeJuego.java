@@ -50,6 +50,7 @@ public class MensajeJuego implements Serializable {
         RONDA_INICIA, 
         TU_TURNO, 
         FIN_RONDA, 
+         PROXIMA_RONDA,  
         FIN_JUEGO,
 
         PEDIR, 
@@ -80,7 +81,7 @@ public class MensajeJuego implements Serializable {
     private Carta carta;
     private List<Jugador> jugadores;
     private EstadoJuego estadoJuego;
-
+     private int segundosEspera;
     private String idSala;
     private String nombreSala;
     private int maxJugadores;
@@ -106,7 +107,13 @@ public class MensajeJuego implements Serializable {
         m.contrasena = contrasena;
         return m;
     }
-
+public static MensajeJuego proximaRonda(int numeroRonda, int segundosEspera) {
+    MensajeJuego m = new MensajeJuego(TipoMensaje.PROXIMA_RONDA);
+    m.numeroRonda = numeroRonda;
+    m.segundosEspera = segundosEspera;
+    m.mensaje = "La ronda " + numeroRonda + " comenzará en " + segundosEspera + " segundos";
+    return m;
+}
     public static MensajeJuego loginExitoso(Usuario usuario) {
         MensajeJuego m = new MensajeJuego(TipoMensaje.LOGIN_EXITOSO);
         m.usuario = usuario;
@@ -290,6 +297,9 @@ public int getNumeroRonda() {
     return numeroRonda; 
 }
 
+public int getSegundosEspera() {
+    return segundosEspera;
+}
 public String getNombreJugador() { 
     return nombreJugador; 
 }

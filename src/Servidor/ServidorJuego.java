@@ -548,23 +548,30 @@ class InstanciaSalaJuego implements LogicaJuego.EscuchaEventosJuego {
         enviarAJugador(id, MensajeJuego.elegirObjetivoAccion(c, a));
     }
     
-    public void alFinRonda(java.util.List<Jugador> jugadores, int ronda) {
-        difundir(MensajeJuego.finRonda(jugadores, ronda));
-        new Timer().schedule(
-            new TimerTask() {
-                public void run() {
-                    synchronized (InstanciaSalaJuego.this) {
-                        if (sala.isJuegoIniciado() &&
-                            logicaJuego.getEstadoJuego().getFase() == EstadoJuego.Fase.FIN_RONDA) {
-                            logicaJuego.iniciarSiguienteRonda();
-                        }
-                    }
-                }
-            },
-            5000
-        );
+    
+public void alFinRonda(java.util.List<Jugador> jugadores, int ronda) {
+    difundir(MensajeJuego.finRonda(jugadores, ronda));
+    
+    
+    if (!logicaJuego.getEstadoJuego().esFinJuego()) {
+        int proximaRonda = ronda + 1;
+        difundir(MensajeJuego.proximaRonda(proximaRonda, 5));
     }
     
+    new Timer().schedule(
+        new TimerTask() {
+            public void run() {
+                synchronized (InstanciaSalaJuego.this) {
+                    if (sala.isJuegoIniciado() &&
+                        logicaJuego.getEstadoJuego().getFase() == EstadoJuego.Fase.FIN_RONDA) {
+                        logicaJuego.iniciarSiguienteRonda();
+                    }
+                }
+            }
+        },
+        5000
+    );
+}
     public void alFinJuego(Jugador ganador) {
         difundir(MensajeJuego.finJuego(
             logicaJuego.getEstadoJuego().getJugadores(), ganador.getId()
