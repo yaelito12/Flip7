@@ -63,11 +63,7 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
         setLocationRelativeTo(null);
     }
 
-    /**
-     * Maneja el intento de cerrar la ventana con advertencias apropiadas
-     */
     private void manejarCierreVentana() {
-        // CASO 1: Hay un juego en curso
         if (juegoIniciado && cliente.estaConectado()) {
             int opcion = JOptionPane.showConfirmDialog(
                     this,
@@ -96,11 +92,18 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             // Si dice NO, no hace nada y permanece en el juego
 
         } // CASO 2: Está en una sala de espera
+        // CASO 2: Esta en una sala de espera
         else if (cliente.getIdSalaActual() != null && cliente.estaConectado()) {
-            String mensaje = "Estás en una sala de espera.\n¿Deseas salir de la sala y cerrar el juego?";
+            String mensaje;
 
             if (esHost) {
-                mensaje = "Eres el HOST de la sala.\nSi sales, la sala se cerrará para todos.\n\n¿Deseas salir?";
+                // Verificar si hay mas jugadores
+                // (Asumimos que si es host y hay sala, puede haber mas jugadores)
+                mensaje = "Eres el HOST de la sala.\n"
+                        + "Si sales, el rol de host se transferira al siguiente jugador.\n\n"
+                        + "Deseas salir?";
+            } else {
+                mensaje = "Estas en una sala de espera.\nDeseas salir de la sala y cerrar el juego?";
             }
 
             int opcion = JOptionPane.showConfirmDialog(
@@ -251,26 +254,28 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             }
 
             @Override
-            public void onLeaveRoom() {
-                if (esHost) {
-                    int confirm = JOptionPane.showConfirmDialog(
-                            VentanaJuego.this,
-                            "Eres el HOST. Si sales, la sala se cerrará.",
-                            "Advertencia",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE
-                    );
+public void onLeaveRoom() {
+    if (esHost) {
+        int confirm = JOptionPane.showConfirmDialog(
+                VentanaJuego.this,
+                "Eres el HOST. Si sales, el rol de host se transferira\n" +
+                "al siguiente jugador en la sala.\n\n" +
+                "Deseas salir?",
+                "Confirmar Salida",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
 
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        cliente.salirSala();
-                        esHost = false;
-                        mostrarPanel("lobby");
-                    }
-                } else {
-                    cliente.salirSala();
-                    mostrarPanel("lobby");
-                }
-            }
+        if (confirm == JOptionPane.YES_OPTION) {
+            cliente.salirSala();
+            esHost = false;
+            mostrarPanel("lobby");
+        }
+    } else {
+        cliente.salirSala();
+        mostrarPanel("lobby");
+    }
+}
 
             @Override
             public void onJoinAsPlayer() {
@@ -1065,10 +1070,8 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             panelInfo.registrar("! Cambio de host: " + nuevoHost);
             panelInfo.registrar("  (Anterior: " + anteriorHost + ")");
 
-            // Notificar en sala de espera
             salaDeEspera.notificarCambioHost(nuevoHost);
 
-            // Verificar si yo soy el nuevo host
             String miNombre = cliente.getNombreJugador();
             if (miNombre != null && miNombre.equals(nuevoHost)) {
                 esHost = true;
