@@ -11,7 +11,6 @@ public class ManejadorCliente implements Runnable {
     private ObjectOutputStream out;
     private int idCliente;
 
-    // Variables oficiales de la versión cliente-servidor
     private int idJugador = -1;
     private int idUsuario = -1;
     private String nombreJugador;
@@ -37,8 +36,6 @@ public class ManejadorCliente implements Runnable {
             conectado = true;
 
             servidor.registrarCliente(this);
-
-            // Enviar mensaje de bienvenida
             MensajeJuego bienvenida = new MensajeJuego(MensajeJuego.TipoMensaje.CONECTADO);
             bienvenida.setIdJugador(idCliente);
             enviarMensaje(bienvenida);
@@ -58,7 +55,6 @@ public class ManejadorCliente implements Runnable {
                 }
             }
         } catch (IOException e) {
-            // socket cerrado
         } finally {
             desconectar();
         }
