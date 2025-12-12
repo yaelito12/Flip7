@@ -1065,12 +1065,14 @@ public class VentanaJuego extends JFrame implements JuegoCliente.EscuchaClienteJ
             panelInfo.registrar("! Cambio de host: " + nuevoHost);
             panelInfo.registrar("  (Anterior: " + anteriorHost + ")");
 
+            // Notificar en sala de espera
+            salaDeEspera.notificarCambioHost(nuevoHost);
+
             // Verificar si yo soy el nuevo host
             String miNombre = cliente.getNombreJugador();
             if (miNombre != null && miNombre.equals(nuevoHost)) {
                 esHost = true;
 
-                // Mostrar notificacion
                 JOptionPane.showMessageDialog(
                         this,
                         "Ahora eres el HOST de la sala.\n\n"

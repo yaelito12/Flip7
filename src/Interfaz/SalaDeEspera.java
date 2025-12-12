@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SalaDeEspera extends JPanel {
 
@@ -29,8 +31,11 @@ public class SalaDeEspera extends JPanel {
     private static final Color PURPLE = new Color(139, 92, 246);
 
     public interface WaitingRoomListener {
+
         void onReady();
+
         void onLeaveRoom();
+
         void onJoinAsPlayer();
     }
 
@@ -44,6 +49,7 @@ public class SalaDeEspera extends JPanel {
         add(createCenterPanel(), BorderLayout.CENTER);
         add(createButtonsPanel(), BorderLayout.SOUTH);
     }
+
     private JPanel createHeader() {
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
@@ -109,7 +115,8 @@ public class SalaDeEspera extends JPanel {
 
         return center;
     }
-     private JPanel createButtonsPanel() {
+
+    private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         panel.setOpaque(false);
 
@@ -119,7 +126,9 @@ public class SalaDeEspera extends JPanel {
         joinAsPlayerBtn.setVisible(false);
 
         leaveBtn.addActionListener(e -> {
-            if (listener != null) listener.onLeaveRoom();
+            if (listener != null) {
+                listener.onLeaveRoom();
+            }
         });
 
         readyBtn.addActionListener(e -> {
@@ -151,8 +160,15 @@ public class SalaDeEspera extends JPanel {
 
             {
                 addMouseListener(new MouseAdapter() {
-                    public void mouseEntered(MouseEvent e) { hover = true; repaint(); }
-                    public void mouseExited(MouseEvent e) { hover = false; repaint(); }
+                    public void mouseEntered(MouseEvent e) {
+                        hover = true;
+                        repaint();
+                    }
+
+                    public void mouseExited(MouseEvent e) {
+                        hover = false;
+                        repaint();
+                    }
                 });
             }
 
@@ -174,7 +190,7 @@ public class SalaDeEspera extends JPanel {
                 g2.setFont(new Font("Arial", Font.BOLD, 14));
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString(getText(), (w - fm.stringWidth(getText())) / 2,
-                              (h + fm.getAscent() - fm.getDescent()) / 2);
+                        (h + fm.getAscent() - fm.getDescent()) / 2);
             }
         };
 
@@ -184,17 +200,20 @@ public class SalaDeEspera extends JPanel {
         btn.setContentAreaFilled(false);
         return btn;
     }
-    
-public void updateRoom(SalaJuego room) {
-        if (room == null) return;
+
+    public void updateRoom(SalaJuego room) {
+        if (room == null) {
+            return;
+        }
 
         SwingUtilities.invokeLater(() -> {
 
             roomNameLabel.setText(room.getNombreSala());
 
             String textCount = "Jugadores: " + room.getJugadoresActuales() + "/" + room.getMaxJugadores();
-            if (room.getCantidadEspectadores() > 0)
+            if (room.getCantidadEspectadores() > 0) {
                 textCount += " | " + room.getCantidadEspectadores() + " observadores";
+            }
 
             playersCountLabel.setText(textCount);
 
@@ -202,8 +221,8 @@ public void updateRoom(SalaJuego room) {
             maxPlayers = room.getMaxJugadores();
 
             joinAsPlayerBtn.setVisible(
-                isSpectator && !room.isJuegoIniciado() &&
-                room.getJugadoresActuales() < room.getMaxJugadores()
+                    isSpectator && !room.isJuegoIniciado()
+                    && room.getJugadoresActuales() < room.getMaxJugadores()
             );
 
             playerListPanel.removeAll();
@@ -213,7 +232,7 @@ public void updateRoom(SalaJuego room) {
                 String nombre = jugadores.get(i);
                 boolean isHost = (i == 0);
                 boolean ready = readyPlayers.contains(nombre);
-               playerListPanel.add(createPlayerEntry(nombre, isHost, ready, false));
+                playerListPanel.add(createPlayerEntry(nombre, isHost, ready, false));
                 playerListPanel.add(Box.createVerticalStrut(8));
             }
 
@@ -238,7 +257,7 @@ public void updateRoom(SalaJuego room) {
         });
     }
 
-public void setPlayerReady(String name) {
+    public void setPlayerReady(String name) {
         readyPlayers.add(name);
     }
 
@@ -268,37 +287,37 @@ public void setPlayerReady(String name) {
 
         String prefix = isSpec ? "(obs) "
                 : ready ? "[OK] "
-                : isHost ? "[Host] "
-                : "";
+                        : isHost ? "[Host] "
+                                : "";
 
         JLabel nameLabel = new JLabel(prefix + name);
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         nameLabel.setForeground(
-            isSpec ? PURPLE
-            : ready ? GREEN.darker()
-            : isHost ? ORANGE
-            : new Color(51, 65, 85)
+                isSpec ? PURPLE
+                        : ready ? GREEN.darker()
+                                : isHost ? ORANGE
+                                        : new Color(51, 65, 85)
         );
 
         String roleText = isSpec ? "Observando"
                 : ready ? "Listo"
-                : isHost ? "Host"
-                : "Esperando";
+                        : isHost ? "Host"
+                                : "Esperando";
 
         JLabel roleLabel = new JLabel(roleText);
         roleLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         roleLabel.setForeground(
                 isSpec ? PURPLE
-                : ready ? GREEN
-                : isHost ? ORANGE
-                : new Color(148, 163, 184));
+                        : ready ? GREEN
+                                : isHost ? ORANGE
+                                        : new Color(148, 163, 184));
 
         entry.add(nameLabel, BorderLayout.WEST);
         entry.add(roleLabel, BorderLayout.EAST);
 
         return entry;
     }
-    
+
     public void setSpectator(boolean spectator) {
         this.isSpectator = spectator;
         this.isReady = false;
@@ -327,5 +346,20 @@ public void setPlayerReady(String name) {
         }
 
         updateStatus();
+    }
+
+    public void notificarCambioHost(String nuevoHost) {
+        SwingUtilities.invokeLater(() -> {
+            statusLabel.setText("! " + nuevoHost + " es ahora el host");
+            statusLabel.setForeground(ORANGE);
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    SwingUtilities.invokeLater(() -> updateStatus());
+                }
+            }, 3000);
+        });
     }
 }
